@@ -10,8 +10,8 @@
 
   /** Update these when you have real contact details */
   const SITE_CONFIG = {
-    phone: "+966500000000",
-    phoneDisplay: "+966 50 000 0000",
+    phone: "17069",
+    phoneDisplay: "17069",
     whatsapp: "966500000000",
   };
 
@@ -184,15 +184,15 @@
     window.addEventListener("scroll", onScroll, { passive: true });
 
     const toggle = document.getElementById("nav-toggle");
-    const drawer = document.getElementById("nav-drawer");
-    if (toggle && drawer) {
+    const menu = document.getElementById("nav-menu");
+    if (toggle && menu) {
       toggle.addEventListener("click", () => {
-        const open = drawer.classList.toggle("is-open");
+        const open = menu.classList.toggle("is-open");
         toggle.setAttribute("aria-expanded", String(open));
       });
-      drawer.querySelectorAll("a").forEach((link) => {
+      menu.querySelectorAll("a").forEach((link) => {
         link.addEventListener("click", () => {
-          drawer.classList.remove("is-open");
+          menu.classList.remove("is-open");
           toggle.setAttribute("aria-expanded", "false");
         });
       });
@@ -282,26 +282,99 @@
     nodes.forEach((n) => observer.observe(n));
   }
 
-  /* ——— Horizontal tracks ——— */
-  function initTracks() {
-    const nudge = (track, direction) => {
-      const slide = track.querySelector(".slide");
-      const gap = 20;
-      const amount = slide ? slide.offsetWidth + gap : 360;
-      const sign = direction === "next" ? 1 : -1;
-      const rtlMult = html.dir === "rtl" ? -1 : 1;
-      track.scrollBy({ left: amount * sign * rtlMult, behavior: "smooth" });
-    };
+  /* ——— Menu slide order CTA ——— */
+  function addSlideOrderOverlay(slide) {
+    if (slide.querySelector(".slide-order-overlay")) return;
 
-    document.querySelectorAll("[data-track-panel]").forEach((panel) => {
+    const lang = currentLang;
+    const overlay = document.createElement("div");
+    overlay.className = "slide-order-overlay";
+
+    const inner = document.createElement("div");
+    inner.className = "slide-order-overlay__inner";
+
+    const msg = document.createElement("p");
+    msg.className = "slide-order-msg";
+    msg.setAttribute("data-en", "Order it now from the hotline");
+    msg.setAttribute("data-ar", "اطلبه الآن من الخط الساخن");
+    msg.textContent = msg.getAttribute(`data-${lang}`) || msg.getAttribute("data-ar");
+
+    const btn = document.createElement("a");
+    btn.className = "btn btn--accent btn--sm slide-order-btn";
+    btn.setAttribute("data-phone-href", "");
+    btn.href = `tel:${SITE_CONFIG.phone.replace(/\s/g, "")}`;
+
+    const btnLabel = document.createElement("span");
+    btnLabel.setAttribute("data-en", "Call Hotline");
+    btnLabel.setAttribute("data-ar", "اتصل بالخط الساخن");
+    btnLabel.textContent = btnLabel.getAttribute(`data-${lang}`) || btnLabel.getAttribute("data-ar");
+
+    const btnNum = document.createElement("strong");
+    btnNum.setAttribute("data-phone-display", "");
+    btnNum.textContent = SITE_CONFIG.phoneDisplay;
+
+    btn.append(btnLabel, document.createTextNode(" "), btnNum);
+    inner.append(msg, btn);
+    overlay.append(inner);
+    slide.appendChild(overlay);
+  }
+
+  function initSlideOrderOverlays() {
+    document.querySelectorAll(".track .slide").forEach(addSlideOrderOverlay);
+    applySiteConfig();
+  }
+
+  /* ——— Menu tracks: continuous marquee ——— */
+  function initTracks() {
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    document.querySelectorAll("[data-track-panel]").forEach((panel, index) => {
       const track = panel.querySelector(".track");
-      const prev = panel.querySelector(".track-btn--prev");
-      const next = panel.querySelector(".track-btn--next");
       if (!track) return;
 
-      prev?.addEventListener("click", () => nudge(track, "prev"));
-      next?.addEventListener("click", () => nudge(track, "next"));
+      if (reduced) {
+        return;
+      }
+
+      const viewport = document.createElement("div");
+      viewport.className = "track-viewport";
+      track.parentNode.insertBefore(viewport, track);
+      viewport.appendChild(track);
+
+      const originals = [...track.querySelectorAll(".slide")];
+      const minLoopSlides = 8;
+      let sets = 1;
+      while (originals.length * sets < minLoopSlides) {
+        sets += 1;
+      }
+      for (let i = 1; i < sets; i += 1) {
+        originals.forEach((slide) => {
+          const repeat = slide.cloneNode(true);
+          repeat.classList.add("slide--repeat");
+          repeat.setAttribute("aria-hidden", "true");
+          repeat.querySelectorAll("img").forEach((img) => img.setAttribute("alt", ""));
+          track.appendChild(repeat);
+        });
+      }
+
+      const loopSet = [...track.querySelectorAll(".slide")];
+      loopSet.forEach((slide) => {
+        const clone = slide.cloneNode(true);
+        clone.classList.add("slide--clone");
+        clone.setAttribute("aria-hidden", "true");
+        clone.querySelectorAll("img").forEach((img) => img.setAttribute("alt", ""));
+        track.appendChild(clone);
+      });
+
+      track.classList.add("track--marquee");
+      const secondsPerSlide = 5.5;
+      const loopCount = loopSet.length;
+      const duration = Math.max(28, loopCount * secondsPerSlide);
+      track.style.setProperty("--marquee-duration", `${duration}s`);
+      track.style.setProperty("--marquee-delay", `${index * -4}s`);
     });
+
+    initSlideOrderOverlays();
   }
 
   /* ——— FAQ accordion ——— */
