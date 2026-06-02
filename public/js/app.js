@@ -84,9 +84,7 @@
       if (label) el.setAttribute("aria-label", label);
     });
 
-    document.querySelectorAll(".lang-opt").forEach((opt) => {
-      opt.classList.toggle("is-active", opt.dataset.lang === lang);
-    });
+    updateLangToggle(lang);
 
     const metaDesc = document.querySelector('meta[name="description"]');
     if (metaDesc) {
@@ -95,6 +93,21 @@
     }
 
     setStoredLang(lang);
+  }
+
+  function updateLangToggle(lang) {
+    const toggle = document.getElementById("lang-toggle");
+    if (!toggle) return;
+
+    const isAr = lang === "ar";
+    const label = toggle.querySelector(".lang-toggle__label");
+    if (label) {
+      const text = label.getAttribute(isAr ? "data-show-when-ar" : "data-show-when-en");
+      if (text) label.textContent = text;
+    }
+
+    const aria = toggle.getAttribute(isAr ? "data-ar-aria" : "data-en-aria");
+    if (aria) toggle.setAttribute("aria-label", aria);
   }
 
   function initLanguage() {
@@ -106,14 +119,6 @@
 
     toggle.addEventListener("click", () => {
       applyTranslations(currentLang === "ar" ? "en" : "ar");
-    });
-
-    toggle.querySelectorAll(".lang-opt").forEach((opt) => {
-      opt.addEventListener("click", (e) => {
-        e.stopPropagation();
-        const target = opt.dataset.lang;
-        if (target && target !== currentLang) applyTranslations(target);
-      });
     });
   }
 
@@ -190,7 +195,7 @@
         const open = menu.classList.toggle("is-open");
         toggle.setAttribute("aria-expanded", String(open));
       });
-      menu.querySelectorAll("a").forEach((link) => {
+      menu.querySelectorAll(".nav-link").forEach((link) => {
         link.addEventListener("click", () => {
           menu.classList.remove("is-open");
           toggle.setAttribute("aria-expanded", "false");
@@ -204,6 +209,7 @@
     const section = document.querySelector("[data-scrolly-section]");
     if (!section) return;
 
+    const scrollTrack = section.querySelector(".manifesto-track");
     const beats = [...section.querySelectorAll("[data-scrolly-beat]")];
     const count = beats.length;
     if (count === 0) return;
@@ -231,12 +237,16 @@
 
       const rect = section.getBoundingClientRect();
       const sectionTop = window.scrollY + rect.top;
-      const scrollRange = section.offsetHeight - window.innerHeight;
+      const scrollRange = scrollTrack
+        ? scrollTrack.offsetHeight
+        : section.offsetHeight - window.innerHeight;
 
       if (scrollRange <= 0) return;
 
-      const progress = Math.min(1, Math.max(0, (window.scrollY - sectionTop) / scrollRange));
-      const index = Math.min(count - 1, Math.floor(progress * count));
+      const scrolled = window.scrollY - sectionTop;
+      const progress = Math.min(1, Math.max(0, scrolled / scrollRange));
+      const index =
+        progress >= 1 ? count - 1 : Math.min(count - 1, Math.floor(progress * count));
 
       section.style.setProperty("--manifesto-progress", String(progress));
       showBeat(index);
@@ -283,8 +293,23 @@
   }
 
   /* ——— Menu slide order CTA ——— */
+  function wrapSlideMedia(slide) {
+    if (slide.querySelector(".slide-media")) {
+      return slide.querySelector(".slide-media");
+    }
+    const img = slide.querySelector(":scope > img");
+    if (!img) return null;
+
+    const media = document.createElement("div");
+    media.className = "slide-media";
+    img.parentNode.insertBefore(media, img);
+    media.appendChild(img);
+    return media;
+  }
+
   function addSlideOrderOverlay(slide) {
-    if (slide.querySelector(".slide-order-overlay")) return;
+    const media = wrapSlideMedia(slide);
+    if (!media || media.querySelector(".slide-order-overlay")) return;
 
     const lang = currentLang;
     const overlay = document.createElement("div");
@@ -316,7 +341,7 @@
     btn.append(btnLabel, document.createTextNode(" "), btnNum);
     inner.append(msg, btn);
     overlay.append(inner);
-    slide.appendChild(overlay);
+    media.appendChild(overlay);
   }
 
   function initSlideOrderOverlays() {
@@ -327,10 +352,13 @@
   /* ——— Menu tracks: continuous marquee ——— */
   function initTracks() {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const isMobile = window.matchMedia("(max-width: 767px)").matches;
 
     document.querySelectorAll("[data-track-panel]").forEach((panel, index) => {
       const track = panel.querySelector(".track");
       if (!track) return;
+
+      track.querySelectorAll(".slide").forEach(wrapSlideMedia);
 
       if (reduced) {
         return;
@@ -367,14 +395,98 @@
       });
 
       track.classList.add("track--marquee");
-      const secondsPerSlide = 5.5;
+      track.removeAttribute("tabindex");
+      const secondsPerSlide = isMobile ? 6.5 : 5.5;
       const loopCount = loopSet.length;
-      const duration = Math.max(28, loopCount * secondsPerSlide);
+      const duration = Math.max(isMobile ? 32 : 28, loopCount * secondsPerSlide);
       track.style.setProperty("--marquee-duration", `${duration}s`);
       track.style.setProperty("--marquee-delay", `${index * -4}s`);
     });
 
     initSlideOrderOverlays();
+    initSlideOrderTap();
+    initTrackWheelScroll();
+  }
+
+  /* Desktop: wheel over menu cards must scroll the page, not trap in a row */
+  function initTrackWheelScroll() {
+    const canHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    if (!canHover) return;
+
+    const menu = document.getElementById("menu");
+    if (!menu) return;
+
+    menu.addEventListener(
+      "wheel",
+      (e) => {
+        if (!e.target.closest(".track-viewport, .track, .slide")) return;
+        const dy = e.deltaY;
+        const dx = e.deltaX;
+        if (Math.abs(dy) < 0.5) return;
+        if (Math.abs(dy) < Math.abs(dx)) return;
+
+        window.scrollBy({ top: dy, left: 0, behavior: "auto" });
+        e.preventDefault();
+        e.stopImmediatePropagation();
+      },
+      { passive: false, capture: true }
+    );
+  }
+
+  /* Touch: tap to show hotline; ignore taps that were scrolls */
+  function initSlideOrderTap() {
+    const coarse = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+    if (!coarse) return;
+
+    const TAP_MOVE_THRESHOLD = 14;
+
+    const closeAll = () => {
+      document.querySelectorAll(".track .slide.is-order-open").forEach((s) => {
+        s.classList.remove("is-order-open");
+      });
+    };
+
+    document.querySelectorAll(".track .slide:not(.slide--offer)").forEach((slide) => {
+      let startX = 0;
+      let startY = 0;
+
+      slide.addEventListener(
+        "touchstart",
+        (e) => {
+          const t = e.touches[0];
+          if (!t) return;
+          startX = t.clientX;
+          startY = t.clientY;
+        },
+        { passive: true }
+      );
+
+      slide.addEventListener(
+        "touchend",
+        (e) => {
+          if (e.target.closest("a.slide-order-btn")) return;
+
+          const t = e.changedTouches[0];
+          const movedX = Math.abs(t.clientX - startX);
+          const movedY = Math.abs(t.clientY - startY);
+          if (movedX > TAP_MOVE_THRESHOLD || movedY > TAP_MOVE_THRESHOLD) return;
+
+          const wasOpen = slide.classList.contains("is-order-open");
+          closeAll();
+          if (!wasOpen) slide.classList.add("is-order-open");
+        },
+        { passive: true }
+      );
+    });
+
+    document.addEventListener(
+      "touchstart",
+      (e) => {
+        if (e.target.closest(".track .slide")) return;
+        closeAll();
+      },
+      { passive: true }
+    );
   }
 
   /* ——— FAQ accordion ——— */
@@ -490,8 +602,20 @@
       lightboxLastFocus?.focus();
     };
 
-    document.querySelectorAll(".offer-card[data-lightbox]").forEach((card) => {
-      card.addEventListener("click", () => open(card));
+    document.querySelectorAll("[data-lightbox][data-offer-title-en]").forEach((card) => {
+      const activate = () => open(card);
+      card.addEventListener("click", (e) => {
+        if (e.target.closest("a.slide-order-btn")) return;
+        activate();
+      });
+      if (card.classList.contains("slide--offer")) {
+        card.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            activate();
+          }
+        });
+      }
     });
 
     lightbox.querySelectorAll("[data-lightbox-close]").forEach((el) => {
@@ -510,17 +634,94 @@
     if (el) el.textContent = String(new Date().getFullYear());
   }
 
-  /* ——— Smooth anchor offset for fixed nav ——— */
+  /* ——— Menu category rail: fixed below header while in menu ——— */
+  function syncHeaderOffset() {
+    const header = document.getElementById("site-header");
+    if (!header) return;
+    document.documentElement.style.setProperty("--header-offset", `${header.offsetHeight}px`);
+  }
+
+  function initMenuRailDock() {
+    const menu = document.getElementById("menu");
+    const rail = document.getElementById("menu-rail");
+    const slot = document.querySelector(".menu-rail-slot");
+    const header = document.getElementById("site-header");
+    if (!menu || !rail || !header) return;
+
+    const dock = () => {
+      syncHeaderOffset();
+      const headerH = header.offsetHeight;
+      const railH = rail.offsetHeight;
+      const menuRect = menu.getBoundingClientRect();
+      const shouldDock = menuRect.top <= headerH && menuRect.bottom > headerH + railH;
+      rail.classList.toggle("menu-rail--dock", shouldDock);
+      if (slot) {
+        slot.style.minHeight = shouldDock ? `${railH}px` : "";
+      }
+    };
+
+    dock();
+    window.addEventListener("scroll", dock, { passive: true });
+    window.addEventListener("resize", dock);
+  }
+
+  /* ——— Menu category rail (scroll spy) ——— */
+  function initMenuCategoryScroll() {
+    const panels = [...document.querySelectorAll(".track-panel[id^='menu-']")];
+    const chips = document.querySelectorAll("[data-menu-chip]");
+    const railScroll = document.querySelector(".menu-rail__scroll");
+    if (!panels.length || !chips.length) return;
+
+    const setActive = (key) => {
+      chips.forEach((chip) => {
+        const active = chip.dataset.menuChip === key;
+        chip.classList.toggle("is-active", active);
+        if (active && railScroll) {
+          chip.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+        }
+      });
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+        if (!visible.length) return;
+        const key = visible[0].target.id.replace("menu-", "");
+        setActive(key);
+      },
+      { rootMargin: "-28% 0px -48% 0px", threshold: [0, 0.15, 0.35, 0.55] }
+    );
+
+    panels.forEach((panel) => observer.observe(panel));
+  }
+
+  /* ——— Smooth anchor offset for fixed nav + menu rail ——— */
   function initAnchors() {
+    const menuRail = document.getElementById("menu-rail");
+
     document.querySelectorAll('a[href^="#"]').forEach((link) => {
       link.addEventListener("click", (e) => {
         const id = link.getAttribute("href");
         if (!id || id === "#") return;
-        const target = document.querySelector(id);
+        let target = document.querySelector(id);
         if (!target) return;
+        if (id === "#manifesto") {
+          target =
+            document.getElementById("manifesto-gateway-title") ||
+            document.getElementById("manifesto");
+        }
+        if (id === "#menu") {
+          target = document.getElementById("menu-offers") || document.getElementById("menu");
+        }
         e.preventDefault();
+        syncHeaderOffset();
         const headerH = document.getElementById("site-header")?.offsetHeight || 72;
-        const top = target.getBoundingClientRect().top + window.scrollY - headerH;
+        const inMenu = target.closest("#menu");
+        const railH =
+          menuRail && inMenu && target.id !== "menu" ? menuRail.offsetHeight : 0;
+        const top = target.getBoundingClientRect().top + window.scrollY - headerH - railH - 8;
         window.scrollTo({ top, behavior: "smooth" });
       });
     });
@@ -533,6 +734,8 @@
     initReveal();
     initManifestoScrolly();
     initTracks();
+    initMenuRailDock();
+    initMenuCategoryScroll();
     initFaq();
     initLightbox();
     initYear();

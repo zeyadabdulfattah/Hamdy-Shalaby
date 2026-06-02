@@ -52,10 +52,13 @@
             <span class="top-bar-hotline-label" data-en="Hotline" data-ar="الخط الساخن">الخط الساخن</span>
             <span class="top-bar-hotline-num" data-phone-display>17069</span>
           </a>
-          <button type="button" class="lang-toggle" id="lang-toggle" aria-label="Switch language">
-            <span class="lang-opt" data-lang="ar">ع</span>
-            <span class="lang-divider" aria-hidden="true"></span>
-            <span class="lang-opt" data-lang="en">EN</span>
+          <button type="button" class="lang-toggle" id="lang-toggle" data-en-aria="Switch to Arabic" data-ar-aria="التبديل إلى الإنجليزية" aria-label="التبديل إلى الإنجليزية">
+            <svg class="lang-toggle__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M2 12h20"/>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+            </svg>
+            <span class="lang-toggle__label" data-show-when-ar="English" data-show-when-en="العربية">English</span>
           </button>
         </div>
       </div>
@@ -66,10 +69,19 @@
       </button>
 
       <div class="nav-menu" id="nav-menu">
+        <a class="nav-drawer-hotline" href="tel:17069" data-phone-href>
+          <span class="nav-drawer-hotline__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4l2 5-2 1.5a11 11 0 0 0 5.5 5.5L16 14l5 2v4a2 2 0 0 1-2 2A15 15 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>
+          </span>
+          <span class="nav-drawer-hotline__copy">
+            <span class="nav-drawer-hotline__label" data-en="Hotline" data-ar="الخط الساخن">الخط الساخن</span>
+            <strong class="nav-drawer-hotline__num" data-phone-display>17069</strong>
+          </span>
+        </a>
         <div class="nav-wing nav-wing--start">
           <ul class="nav-links" role="list">
             <li class="nav-item">
-              <a class="nav-link" href="#manifesto" data-en="Our Story" data-ar="قصتنا">قصتنا</a>
+              <a class="nav-link" href="#menu" data-en="Menu" data-ar="القائمة">القائمة</a>
               <a class="nav-hover-cta" href="tel:17069" data-phone-href>
                 <span class="nav-hover-cta__inner">
                   <svg class="nav-hover-cta__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 4h4l2 5-2 1.5a11 11 0 0 0 5.5 5.5L16 14l5 2v4a2 2 0 0 1-2 2A15 15 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>
@@ -81,7 +93,7 @@
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#menu" data-en="Menu" data-ar="القائمة">القائمة</a>
+              <a class="nav-link" href="#manifesto" data-en="Why Us" data-ar="لماذا نحن">لماذا نحن</a>
               <a class="nav-hover-cta" href="tel:17069" data-phone-href>
                 <span class="nav-hover-cta__inner">
                   <svg class="nav-hover-cta__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 4h4l2 5-2 1.5a11 11 0 0 0 5.5 5.5L16 14l5 2v4a2 2 0 0 1-2 2A15 15 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>
@@ -110,7 +122,7 @@
         <div class="nav-wing nav-wing--end">
           <ul class="nav-links" role="list">
             <li class="nav-item">
-              <a class="nav-link" href="#offers" data-en="Offers" data-ar="العروض">العروض</a>
+              <a class="nav-link" href="#menu-offers" data-en="Offers" data-ar="العروض">العروض</a>
               <a class="nav-hover-cta" href="tel:17069" data-phone-href>
                 <span class="nav-hover-cta__inner">
                   <svg class="nav-hover-cta__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 4h4l2 5-2 1.5a11 11 0 0 0 5.5 5.5L16 14l5 2v4a2 2 0 0 1-2 2A15 15 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>
@@ -175,64 +187,111 @@
       </div>
     </section>
 
-    <!-- MANIFESTO: Scrollytelling + IMG_7013 background -->
-    <section class="manifesto" id="manifesto" data-scrolly-section>
-      <div class="manifesto-pin">
-        <div class="manifesto-media" aria-hidden="true">
-          <img class="manifesto-bg-img" src="images-hero/IMG_7013.jpg" alt="" width="1920" height="1080" loading="lazy" decoding="async">
-          <div class="manifesto-overlay"></div>
-        </div>
-        <div class="container manifesto-stage">
-          <div class="manifesto-progress" aria-hidden="true">
-            <span class="manifesto-progress-fill"></span>
-          </div>
-          <div class="scrolly-stack">
-            <article class="scrolly-beat is-active" data-scrolly-beat>
-              <p class="manifesto-eyebrow" data-en="Why Hamdy Shalaby" data-ar="لماذا حمدي شلبي">لماذا حمدي شلبي</p>
-            </article>
-            <article class="scrolly-beat" data-scrolly-beat>
-              <h2 class="manifesto-headline" data-en="Fire, craft, and a name you can trust." data-ar="نار، حرفة، واسم تثق به.">نار، حرفة، واسم تثق به.</h2>
-            </article>
-            <article class="scrolly-beat" data-scrolly-beat>
-              <p class="manifesto-body" data-en="We do not chase trends. We perfect the grill—charcoal heat that seals flavor, cuts chosen for marbling, and service that respects your time. From the first flame to the last bite, مشوي في المضمون is not a slogan. It is how we cook." data-ar="لا نطارد الموضة. نُتقن الشواء—حرارة فحم تُثبت النكهة، قطع تُختار لعروقها، وخدمة تحترم وقتك. من أول لهب إلى آخر لقمة، مشوي في المضمون ليس شعاراً. إنه أسلوب طبخنا.">لا نطارد الموضة. نُتقن الشواء—حرارة فحم تُثبت النكهة، قطع تُختار لعروقها، وخدمة تحترم وقتك. من أول لهب إلى آخر لقمة، مشوي في المضمون ليس شعاراً. إنه أسلوب طبخنا.</p>
-            </article>
-            <article class="scrolly-beat" data-scrolly-beat>
-              <ul class="stat-row stat-row--on-media" role="list">
-                <li>
-                  <span class="stat-value" data-en="Charcoal" data-ar="فحم">فحم</span>
-                  <span class="stat-label" data-en="Live-fire grilling" data-ar="شواء حي على النار">شواء حي على النار</span>
-                </li>
-                <li>
-                  <span class="stat-value" data-en="Premium" data-ar="مختار">مختار</span>
-                  <span class="stat-label" data-en="Ingredient standards" data-ar="معايير المكونات">معايير المكونات</span>
-                </li>
-                <li>
-                  <span class="stat-value" data-en="Guaranteed" data-ar="مضمون">مضمون</span>
-                  <span class="stat-label" data-en="Quality in every plate" data-ar="جودة في كل طبق">جودة في كل طبق</span>
-                </li>
-              </ul>
-            </article>
-          </div>
-        </div>
-      </div>
-      <div class="manifesto-track" aria-hidden="true"></div>
-    </section>
-
     <!-- MENU: Desire architecture by category -->
     <section class="menu section section--elevated" id="menu">
-      <div class="container">
+      <div class="menu-rail-slot">
+      <nav class="menu-rail" id="menu-rail" aria-label="Menu categories">
+        <div class="menu-rail__scroll">
+          <a class="menu-rail__orb" href="#menu-offers" data-menu-chip="offers">
+            <span class="menu-rail__orb-mark">
+              <span class="menu-rail__ring" aria-hidden="true"></span>
+              <span class="menu-rail__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><circle cx="7" cy="7" r="1.5" fill="currentColor" stroke="none"/></svg></span>
+            </span>
+            <span class="menu-rail__label" data-en="Offers" data-ar="العروض">العروض</span>
+          </a>
+          <a class="menu-rail__orb" href="#menu-meals" data-menu-chip="meals">
+            <span class="menu-rail__orb-mark">
+              <span class="menu-rail__ring" aria-hidden="true"></span>
+              <span class="menu-rail__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 14h16M6 18h12M8 10h8M10 6h4"/></svg></span>
+            </span>
+            <span class="menu-rail__label" data-en="Grills" data-ar="مشويات">مشويات</span>
+          </a>
+          <a class="menu-rail__orb" href="#menu-sandwiches" data-menu-chip="sandwiches">
+            <span class="menu-rail__orb-mark">
+              <span class="menu-rail__ring" aria-hidden="true"></span>
+              <span class="menu-rail__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12h16M6 16h12M5 8h14l-1-3H6z"/></svg></span>
+            </span>
+            <span class="menu-rail__label" data-en="Sandwiches" data-ar="ساندويتش">ساندويتش</span>
+          </a>
+          <a class="menu-rail__orb" href="#menu-drinks" data-menu-chip="drinks">
+            <span class="menu-rail__orb-mark">
+              <span class="menu-rail__ring" aria-hidden="true"></span>
+              <span class="menu-rail__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 4h8v2l-2 14H10L8 6V4z"/></svg></span>
+            </span>
+            <span class="menu-rail__label" data-en="Drinks" data-ar="مشروبات">مشروبات</span>
+          </a>
+          <a class="menu-rail__orb" href="#menu-desserts" data-menu-chip="desserts">
+            <span class="menu-rail__orb-mark">
+              <span class="menu-rail__ring" aria-hidden="true"></span>
+              <span class="menu-rail__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="8"/><path d="M8 14s2 2 4 2 4-2 4-2"/></svg></span>
+            </span>
+            <span class="menu-rail__label" data-en="Desserts" data-ar="حلويات">حلويات</span>
+          </a>
+          <a class="menu-rail__orb" href="#menu-signature" data-menu-chip="signature">
+            <span class="menu-rail__orb-mark">
+              <span class="menu-rail__ring" aria-hidden="true"></span>
+              <span class="menu-rail__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3l2.2 6.8H21l-5.5 4 2.1 6.7L12 16.5 6.4 20.5l2.1-6.7L3 9.8h6.8z"/></svg></span>
+            </span>
+            <span class="menu-rail__label" data-en="Signature" data-ar="توقيع">توقيع</span>
+          </a>
+        </div>
+      </nav>
+      </div>
+
+      <div class="container menu-body">
         <header class="section-header" data-reveal>
           <p class="section-label" data-en="The Menu" data-ar="القائمة">القائمة</p>
           <h2 class="section-title" data-en="Built to crave. Grilled to impress." data-ar="تُشهى قبل أن تُقدَّم. وتُشوى لتبهر.">تُشهى قبل أن تُقدَّم. وتُشوى لتبهر.</h2>
-          <p class="section-desc" data-en="Five chapters of flavor—each collection flows on its own. Hover any row to pause." data-ar="خمس فصول من النكهة—كل مجموعة تتحرك بسلاسة. مرّر المؤشر لإيقاف الصف مؤقتاً.">خمس فصول من النكهة—كل مجموعة تتحرك بسلاسة. مرّر المؤشر لإيقاف الصف مؤقتاً.</p>
+          <p class="section-desc" data-en="Start with our offers—then browse every category. Swipe each row and tap to call the hotline." data-ar="ابدأ بالعروض—ثم تصفّح كل الفئات. مرّر كل صف واضغط للاتصال بالخط الساخن.">ابدأ بالعروض—ثم تصفّح كل الفئات. مرّر كل صف واضغط للاتصال بالخط الساخن.</p>
         </header>
 
+        <!-- Offers (featured first) -->
+        <article class="track-panel track-panel--offers" id="menu-offers" data-track-panel>
+          <div class="track-panel-head">
+            <h3 data-en="Limited Offers" data-ar="عروض محدودة">عروض محدودة</h3>
+          </div>
+          <div class="track" role="region" aria-label="Offers">
+            <figure class="slide slide--offer" tabindex="0" role="button" data-lightbox="images-offer/IMG_7042.JPG" data-offer-title-en="Weekend Family Feast" data-offer-title-ar="وليمة العائلة في نهاية الأسبوع" data-offer-desc-en="Premium mixed grill for four—available Friday &amp; Saturday. Call to book." data-offer-desc-ar="مشكل فاخر لأربعة—متاح الجمعة والسبت. اتصل للحجز.">
+              <img src="images-offer/IMG_7042.JPG" alt="" width="800" height="600" loading="lazy" decoding="async">
+              <figcaption>
+                <span class="slide-offer-badge" data-en="Offer" data-ar="عرض">عرض</span>
+                <strong data-en="Family Feast" data-ar="وليمة العائلة">وليمة العائلة</strong>
+                <span data-en="Premium mixed grill for four—Fri &amp; Sat. Tap for details." data-ar="مشكل فاخر لأربعة—الجمعة والسبت. اضغط للتفاصيل.">مشكل فاخر لأربعة—الجمعة والسبت. اضغط للتفاصيل.</span>
+              </figcaption>
+            </figure>
+            <figure class="slide slide--offer" tabindex="0" role="button" data-lightbox="images-offer/IMG_7043.JPG" data-offer-title-en="Grill Master's Night" data-offer-title-ar="ليلة الشيف" data-offer-desc-en="Chef-selected cuts and sides—limited tables per evening." data-offer-desc-ar="قطع وأطباق جانبية من اختيار الشيف—طاولات محدودة كل مساء.">
+              <img src="images-offer/IMG_7043.JPG" alt="" width="800" height="600" loading="lazy" decoding="async">
+              <figcaption>
+                <span class="slide-offer-badge" data-en="Offer" data-ar="عرض">عرض</span>
+                <strong data-en="Chef's Night" data-ar="ليلة الشيف">ليلة الشيف</strong>
+                <span data-en="Chef-selected cuts—limited tables. Tap for details." data-ar="قطع من اختيار الشيف—طاولات محدودة. اضغط للتفاصيل.">قطع من اختيار الشيف—طاولات محدودة. اضغط للتفاصيل.</span>
+              </figcaption>
+            </figure>
+            <figure class="slide slide--offer" tabindex="0" role="button" data-lightbox="images-offer/IMG_7060.JPG" data-offer-title-en="Corporate Gathering" data-offer-title-ar="تجمع شركات" data-offer-desc-en="Private sections for teams—custom menus by phone inquiry." data-offer-desc-ar="أقسام خاصة للفرق—قوائم مخصصة عبر الهاتف.">
+              <img src="images-offer/IMG_7060.JPG" alt="" width="800" height="600" loading="lazy" decoding="async">
+              <figcaption>
+                <span class="slide-offer-badge" data-en="Offer" data-ar="عرض">عرض</span>
+                <strong data-en="Corporate" data-ar="شركات">شركات</strong>
+                <span data-en="Private sections for teams. Tap for details." data-ar="أقسام خاصة للفرق. اضغط للتفاصيل.">أقسام خاصة للفرق. اضغط للتفاصيل.</span>
+              </figcaption>
+            </figure>
+            <figure class="slide slide--offer" tabindex="0" role="button" data-lightbox="images-offer/IMG_7061.JPG" data-offer-title-en="Celebration Package" data-offer-title-ar="باقة الاحتفال" data-offer-desc-en="Birthdays and milestones—reserve early for the best seating." data-offer-desc-ar="أعياد ميلاد ومناسبات—احجز مبكراً لأفضل مقاعد.">
+              <img src="images-offer/IMG_7061.JPG" alt="" width="800" height="600" loading="lazy" decoding="async">
+              <figcaption>
+                <span class="slide-offer-badge" data-en="Offer" data-ar="عرض">عرض</span>
+                <strong data-en="Celebrate" data-ar="احتفل">احتفل</strong>
+                <span data-en="Birthdays &amp; milestones—book early. Tap for details." data-ar="أعياد ومناسبات—احجز مبكراً. اضغط للتفاصيل.">أعياد ومناسبات—احجز مبكراً. اضغط للتفاصيل.</span>
+              </figcaption>
+            </figure>
+          </div>
+        </article>
+
         <!-- Grills & Mains -->
-        <article class="track-panel track-panel--offset-a" data-track-panel>
+        <article class="track-panel track-panel--offset-a" id="menu-meals" data-track-panel>
           <div class="track-panel-head">
             <h3 data-en="Grills &amp; Mains" data-ar="مشويات وأطباق رئيسية">مشويات وأطباق رئيسية</h3>
           </div>
-          <div class="track" tabindex="0" role="region" aria-label="Grills">
+          <div class="track" role="region" aria-label="Grills">
             <figure class="slide">
               <img src="images-meals/IMG_7014.JPG" alt="" width="800" height="600" loading="lazy" decoding="async">
               <figcaption>
@@ -293,11 +352,11 @@
         </article>
 
         <!-- Sandwiches -->
-        <article class="track-panel track-panel--offset-b" data-track-panel>
+        <article class="track-panel track-panel--offset-b" id="menu-sandwiches" data-track-panel>
           <div class="track-panel-head">
             <h3 data-en="Sandwiches" data-ar="ساندويتشات">ساندويتشات</h3>
           </div>
-          <div class="track" tabindex="0" role="region">
+          <div class="track" role="region">
             <figure class="slide">
               <img src="images-sandwiches/IMG_7015.JPG" alt="" width="800" height="600" loading="lazy" decoding="async">
               <figcaption>
@@ -358,11 +417,11 @@
         </article>
 
         <!-- Drinks -->
-        <article class="track-panel track-panel--offset-c" data-track-panel>
+        <article class="track-panel track-panel--offset-c" id="menu-drinks" data-track-panel>
           <div class="track-panel-head">
             <h3 data-en="Drinks" data-ar="مشروبات">مشروبات</h3>
           </div>
-          <div class="track" tabindex="0" role="region">
+          <div class="track" role="region">
             <figure class="slide">
               <img src="images-drinks/IMG_7028.JPG" alt="" width="800" height="600" loading="lazy" decoding="async">
               <figcaption>
@@ -388,11 +447,11 @@
         </article>
 
         <!-- Desserts -->
-        <article class="track-panel track-panel--offset-a" data-track-panel>
+        <article class="track-panel track-panel--offset-a" id="menu-desserts" data-track-panel>
           <div class="track-panel-head">
             <h3 data-en="Desserts" data-ar="حلويات">حلويات</h3>
           </div>
-          <div class="track" tabindex="0" role="region">
+          <div class="track" role="region">
             <figure class="slide">
               <img src="images-dessert/IMG_7026.JPG" alt="" width="800" height="600" loading="lazy" decoding="async">
               <figcaption>
@@ -404,11 +463,11 @@
         </article>
 
         <!-- Signature Plates -->
-        <article class="track-panel track-panel--offset-b" data-track-panel>
+        <article class="track-panel track-panel--offset-b" id="menu-signature" data-track-panel>
           <div class="track-panel-head">
             <h3 data-en="Signature Plates" data-ar="أطباق التوقيع">أطباق التوقيع</h3>
           </div>
-          <div class="track" tabindex="0" role="region">
+          <div class="track" role="region">
             <figure class="slide">
               <img src="images-marketing-plates/IMG_7040.JPG" alt="" width="800" height="600" loading="lazy" decoding="async">
               <figcaption>
@@ -470,6 +529,56 @@
       </div>
     </section>
 
+    <!-- MANIFESTO: Prominent Why Us + scrollytelling -->
+    <section class="manifesto" id="manifesto" aria-labelledby="manifesto-gateway-title">
+      <div class="manifesto-gateway">
+        <div class="container manifesto-gateway__inner">
+          <h2 class="manifesto-gateway__title" id="manifesto-gateway-title" data-en="Why Us" data-ar="لماذا نحن">لماذا نحن</h2>
+        </div>
+      </div>
+      <div class="manifesto-scrolly" data-scrolly-section>
+      <div class="manifesto-pin">
+        <div class="manifesto-media" aria-hidden="true">
+          <img class="manifesto-bg-img" src="images-hero/IMG_7013.jpg" alt="" width="1920" height="1080" loading="lazy" decoding="async">
+          <div class="manifesto-overlay"></div>
+        </div>
+        <div class="container manifesto-stage">
+          <div class="manifesto-progress" aria-hidden="true">
+            <span class="manifesto-progress-fill"></span>
+          </div>
+          <div class="scrolly-stack">
+            <article class="scrolly-beat is-active" data-scrolly-beat>
+              <p class="manifesto-eyebrow" data-en="Why Us" data-ar="لماذا نحن">لماذا نحن</p>
+            </article>
+            <article class="scrolly-beat" data-scrolly-beat>
+              <h2 class="manifesto-headline" data-en="Fire, craft, and a name you can trust." data-ar="نار، حرفة، واسم تثق به.">نار، حرفة، واسم تثق به.</h2>
+            </article>
+            <article class="scrolly-beat" data-scrolly-beat>
+              <p class="manifesto-body" data-en="We do not chase trends. We perfect the grill—charcoal heat that seals flavor, cuts chosen for marbling, and service that respects your time. From the first flame to the last bite, grilled with certainty is not a slogan. It is how we cook." data-ar="لا نطارد الموضة. نُتقن الشواء—حرارة فحم تُثبت النكهة، قطع تُختار لعروقها، وخدمة تحترم وقتك. من أول لهب إلى آخر لقمة، مشوي في المضمون ليس شعاراً. إنه أسلوب طبخنا.">لا نطارد الموضة. نُتقن الشواء—حرارة فحم تُثبت النكهة، قطع تُختار لعروقها، وخدمة تحترم وقتك. من أول لهب إلى آخر لقمة، مشوي في المضمون ليس شعاراً. إنه أسلوب طبخنا.</p>
+            </article>
+            <article class="scrolly-beat" data-scrolly-beat>
+              <ul class="stat-row stat-row--on-media" role="list">
+                <li>
+                  <span class="stat-value" data-en="Charcoal" data-ar="فحم">فحم</span>
+                  <span class="stat-label" data-en="Live-fire grilling" data-ar="شواء حي على النار">شواء حي على النار</span>
+                </li>
+                <li>
+                  <span class="stat-value" data-en="Premium" data-ar="مختار">مختار</span>
+                  <span class="stat-label" data-en="Ingredient standards" data-ar="معايير المكونات">معايير المكونات</span>
+                </li>
+                <li>
+                  <span class="stat-value" data-en="Guaranteed" data-ar="مضمون">مضمون</span>
+                  <span class="stat-label" data-en="Quality in every plate" data-ar="جودة في كل طبق">جودة في كل طبق</span>
+                </li>
+              </ul>
+            </article>
+          </div>
+        </div>
+      </div>
+      <div class="manifesto-track" aria-hidden="true"></div>
+      </div>
+    </section>
+
     <!-- VENUE: Aspiration + social proof -->
     <section class="venue section" id="venue">
       <div class="container">
@@ -504,35 +613,6 @@
           <img src="Images-restraunt/IMG_7059.JPG" alt="" width="1200" height="800" loading="lazy" decoding="async">
           <figcaption data-en="Your table is waiting—call to claim it." data-ar="طاولتك بانتظارك—اتصل لتحجزها.">طاولتك بانتظارك—اتصل لتحجزها.</figcaption>
         </figure>
-      </div>
-    </section>
-
-    <!-- OFFERS: Urgency -->
-    <section class="offers section section--elevated" id="offers">
-      <div class="container">
-        <header class="section-header" data-reveal>
-          <p class="section-label" data-en="Limited Offers" data-ar="عروض محدودة">عروض محدودة</p>
-          <h2 class="section-title" data-en="Celebrate now. The grill won't wait." data-ar="احتفل الآن. الشواء لا ينتظر.">احتفل الآن. الشواء لا ينتظر.</h2>
-          <p class="section-desc" data-en="Tap any offer for details—then call to secure your date." data-ar="اضغط أي عرض للتفاصيل—ثم اتصل لتثبيت موعدك.">اضغط أي عرض للتفاصيل—ثم اتصل لتثبيت موعدك.</p>
-        </header>
-        <div class="offers-strip" data-reveal>
-          <button type="button" class="offer-card" data-lightbox="images-offer/IMG_7042.JPG" data-offer-title-en="Weekend Family Feast" data-offer-title-ar="وليمة العائلة في نهاية الأسبوع" data-offer-desc-en="Premium mixed grill for four—available Friday &amp; Saturday. Call to book." data-offer-desc-ar="مشكل فاخر لأربعة—متاح الجمعة والسبت. اتصل للحجز.">
-            <img src="images-offer/IMG_7042.JPG" alt="" width="600" height="400" loading="lazy" decoding="async">
-            <span class="offer-label" data-en="Family Feast" data-ar="وليمة العائلة">وليمة العائلة</span>
-          </button>
-          <button type="button" class="offer-card" data-lightbox="images-offer/IMG_7043.JPG" data-offer-title-en="Grill Master's Night" data-offer-title-ar="ليلة الشيف" data-offer-desc-en="Chef-selected cuts and sides—limited tables per evening." data-offer-desc-ar="قطع وأطباق جانبية من اختيار الشيف—طاولات محدودة كل مساء.">
-            <img src="images-offer/IMG_7043.JPG" alt="" width="600" height="400" loading="lazy" decoding="async">
-            <span class="offer-label" data-en="Chef's Night" data-ar="ليلة الشيف">ليلة الشيف</span>
-          </button>
-          <button type="button" class="offer-card" data-lightbox="images-offer/IMG_7060.JPG" data-offer-title-en="Corporate Gathering" data-offer-title-ar="تجمع شركات" data-offer-desc-en="Private sections for teams—custom menus by phone inquiry." data-offer-desc-ar="أقسام خاصة للفرق—قوائم مخصصة عبر الهاتف.">
-            <img src="images-offer/IMG_7060.JPG" alt="" width="600" height="400" loading="lazy" decoding="async">
-            <span class="offer-label" data-en="Corporate" data-ar="شركات">شركات</span>
-          </button>
-          <button type="button" class="offer-card" data-lightbox="images-offer/IMG_7061.JPG" data-offer-title-en="Celebration Package" data-offer-title-ar="باقة الاحتفال" data-offer-desc-en="Birthdays and milestones—reserve early for the best seating." data-offer-desc-ar="أعياد ميلاد ومناسبات—احجز مبكراً لأفضل مقاعد.">
-            <img src="images-offer/IMG_7061.JPG" alt="" width="600" height="400" loading="lazy" decoding="async">
-            <span class="offer-label" data-en="Celebrate" data-ar="احتفل">احتفل</span>
-          </button>
-        </div>
       </div>
     </section>
 
@@ -640,9 +720,9 @@
       <div class="footer-col">
         <h4 data-en="Connect" data-ar="تواصل">تواصل</h4>
         <ul role="list">
-          <li><a href="#" data-en="Instagram" data-ar="إنستغرام">إنستغرام</a></li>
-          <li><a href="#" data-en="Snapchat" data-ar="سناب شات">سناب شات</a></li>
-          <li><a href="#" data-en="TikTok" data-ar="تيك توك">تيك توك</a></li>
+          <li><a href="https://www.instagram.com/hamdyshalaby_restaurant?igsh=MW10Zjg0ZnZicm9kdg==" target="_blank" rel="noopener noreferrer" data-en="Instagram" data-ar="إنستغرام">إنستغرام</a></li>
+          <li><a href="https://www.facebook.com/share/1LXvhk6Qzn/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" data-en="Facebook" data-ar="فيسبوك">فيسبوك</a></li>
+          <li><a href="https://www.tiktok.com/@hamdyshalaby_restaurant?_r=1&amp;_t=ZS-96RKP8vPCWS" target="_blank" rel="noopener noreferrer" data-en="TikTok" data-ar="تيك توك">تيك توك</a></li>
         </ul>
       </div>
       <div class="footer-col">
