@@ -344,11 +344,6 @@
     media.appendChild(overlay);
   }
 
-  function initSlideOrderOverlays() {
-    document.querySelectorAll(".track .slide").forEach(addSlideOrderOverlay);
-    applySiteConfig();
-  }
-
   /* ——— Menu tracks: continuous marquee ——— */
   function initTracks() {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -359,6 +354,9 @@
       if (!track) return;
 
       track.querySelectorAll(".slide").forEach(wrapSlideMedia);
+      track
+        .querySelectorAll(".slide:not(.slide--offer)")
+        .forEach(addSlideOrderOverlay);
 
       if (reduced) {
         return;
@@ -403,7 +401,7 @@
       track.style.setProperty("--marquee-delay", `${index * -4}s`);
     });
 
-    initSlideOrderOverlays();
+    applySiteConfig();
     initSlideOrderTap();
     initTrackWheelScroll();
   }
@@ -438,51 +436,84 @@
     const coarse = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
     if (!coarse) return;
 
+    const menu = document.getElementById("menu");
+    if (!menu) return;
+
     const TAP_MOVE_THRESHOLD = 14;
+    const touchStarts = new WeakMap();
 
     const closeAll = () => {
-      document.querySelectorAll(".track .slide.is-order-open").forEach((s) => {
+      menu.querySelectorAll(".track .slide.is-order-open").forEach((s) => {
         s.classList.remove("is-order-open");
       });
     };
 
-    document.querySelectorAll(".track .slide:not(.slide--offer)").forEach((slide) => {
-      let startX = 0;
-      let startY = 0;
-
-      slide.addEventListener(
-        "touchstart",
-        (e) => {
-          const t = e.touches[0];
-          if (!t) return;
-          startX = t.clientX;
-          startY = t.clientY;
-        },
-        { passive: true }
+    const syncOpenState = (slide, open) => {
+      const track = slide.closest(".track");
+      if (!track) return;
+      const slides = [...track.querySelectorAll(".slide")];
+      const index = slides.indexOf(slide);
+      if (index < 0) return;
+      const originals = slides.filter(
+        (s) => !s.classList.contains("slide--clone") && !s.classList.contains("slide--repeat")
       );
+      const original = originals[index % originals.length];
+      if (!original) return;
 
-      slide.addEventListener(
-        "touchend",
-        (e) => {
-          if (e.target.closest("a.slide-order-btn")) return;
+      closeAll();
+      if (open) {
+        slides.forEach((s, i) => {
+          if (i % originals.length === index % originals.length) {
+            s.classList.add("is-order-open");
+          }
+        });
+      }
+    };
 
-          const t = e.changedTouches[0];
-          const movedX = Math.abs(t.clientX - startX);
-          const movedY = Math.abs(t.clientY - startY);
-          if (movedX > TAP_MOVE_THRESHOLD || movedY > TAP_MOVE_THRESHOLD) return;
-
-          const wasOpen = slide.classList.contains("is-order-open");
-          closeAll();
-          if (!wasOpen) slide.classList.add("is-order-open");
-        },
-        { passive: true }
-      );
-    });
-
-    document.addEventListener(
+    menu.addEventListener(
       "touchstart",
       (e) => {
-        if (e.target.closest(".track .slide")) return;
+        const slide = e.target.closest(".track .slide:not(.slide--offer)");
+        if (!slide) return;
+        const t = e.touches[0];
+        if (!t) return;
+        touchStarts.set(slide, { x: t.clientX, y: t.clientY });
+      },
+      { passive: true }
+    );
+
+    menu.addEventListener(
+      "touchend",
+      (e) => {
+        const slide = e.target.closest(".track .slide:not(.slide--offer)");
+        if (!slide) {
+          if (!e.target.closest(".track .slide")) closeAll();
+          return;
+        }
+
+        if (e.target.closest("a.slide-order-btn")) return;
+
+        const start = touchStarts.get(slide);
+        touchStarts.delete(slide);
+        if (!start) return;
+
+        const t = e.changedTouches[0];
+        if (!t) return;
+        const movedX = Math.abs(t.clientX - start.x);
+        const movedY = Math.abs(t.clientY - start.y);
+        if (movedX > TAP_MOVE_THRESHOLD || movedY > TAP_MOVE_THRESHOLD) return;
+
+        e.stopPropagation();
+        const wasOpen = slide.classList.contains("is-order-open");
+        syncOpenState(slide, !wasOpen);
+      },
+      { passive: true }
+    );
+
+    document.addEventListener(
+      "touchend",
+      (e) => {
+        if (e.target.closest("#menu .track .slide")) return;
         closeAll();
       },
       { passive: true }
@@ -553,6 +584,7 @@
     const titleEl = lightbox.querySelector(".lightbox-title");
     const descEl = lightbox.querySelector(".lightbox-desc");
     const focusableSelector = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+    let scrollLockY = 0;
 
     const trapFocus = (e) => {
       if (e.key !== "Tab" || lightbox.hidden) return;
@@ -588,26 +620,40 @@
         descEl.textContent = isAr ? card.dataset.offerDescAr || "" : card.dataset.offerDescEn || "";
       }
 
+      scrollLockY = window.scrollY;
       lightbox.hidden = false;
       lightbox.setAttribute("aria-hidden", "false");
-      document.body.style.overflow = "hidden";
+      document.body.classList.add("is-lightbox-open");
+      document.body.style.top = `-${scrollLockY}px`;
       lightbox.querySelector(".lightbox-close")?.focus();
     };
 
     const close = () => {
       lightbox.hidden = true;
       lightbox.setAttribute("aria-hidden", "true");
-      document.body.style.overflow = "";
+      document.body.classList.remove("is-lightbox-open");
+      document.body.style.top = "";
+      window.scrollTo(0, scrollLockY);
       if (img) img.src = "";
       lightboxLastFocus?.focus();
     };
 
+    const isTouchUi = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+
     document.querySelectorAll("[data-lightbox][data-offer-title-en]").forEach((card) => {
       const activate = () => open(card);
-      card.addEventListener("click", (e) => {
-        if (e.target.closest("a.slide-order-btn")) return;
-        activate();
-      });
+      if (isTouchUi) {
+        card.addEventListener(
+          "touchend",
+          (e) => {
+            e.preventDefault();
+            activate();
+          },
+          { passive: false }
+        );
+      } else {
+        card.addEventListener("click", activate);
+      }
       if (card.classList.contains("slide--offer")) {
         card.addEventListener("keydown", (e) => {
           if (e.key === "Enter" || e.key === " ") {

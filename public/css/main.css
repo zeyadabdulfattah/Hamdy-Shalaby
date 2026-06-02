@@ -1998,6 +1998,7 @@ body.is-en .slide-offer-badge {
 .track-viewport {
   overflow: hidden;
   touch-action: pan-y;
+  min-height: min(52vw, 200px);
   padding-block: 1.75rem 1.25rem;
   -webkit-mask-image: linear-gradient(
     90deg,
@@ -2057,10 +2058,6 @@ body.is-en .slide-offer-badge {
   .track--marquee:has(.slide:focus-within) {
     animation-play-state: paused;
   }
-}
-
-.track--marquee:has(.slide.is-order-open) {
-  animation-play-state: paused;
 }
 
 .track::-webkit-scrollbar {
@@ -2626,6 +2623,15 @@ body.is-en .footer-tagline {
   text-align: center;
   font-size: 0.75rem;
   color: var(--text-muted);
+}
+
+/* Lightbox — fixed body lock avoids iOS breaking menu transforms */
+body.is-lightbox-open {
+  position: fixed;
+  width: 100%;
+  left: 0;
+  right: 0;
+  overflow: hidden;
 }
 
 /* Lightbox */
