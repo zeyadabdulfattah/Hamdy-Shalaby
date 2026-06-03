@@ -1846,6 +1846,15 @@ html[lang="ar"] .menu-rail__label,
 
   .track-viewport {
     padding-block: 0.35rem 0.25rem;
+    pointer-events: auto;
+    overflow-x: auto;
+    overflow-y: visible;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .track--static {
+    mask-image: none;
+    -webkit-mask-image: none;
   }
 
   .track {
@@ -1890,7 +1899,7 @@ html[lang="ar"] .menu-rail__label,
   }
 
   .track .slide.is-order-open {
-    transform: scale(1.02);
+    transform: none;
   }
 
   .slide-order-overlay {
@@ -2000,6 +2009,8 @@ body.is-en .slide-offer-badge {
   touch-action: pan-y;
   min-height: min(52vw, 200px);
   padding-block: 1.75rem 1.25rem;
+  /* Let wheel events reach the page; slides re-enable pointer events */
+  pointer-events: none;
   -webkit-mask-image: linear-gradient(
     90deg,
     transparent,
@@ -2044,20 +2055,34 @@ body.is-en .slide-offer-badge {
   direction: ltr;
   scrollbar-width: none;
   touch-action: pan-y;
+  pointer-events: none;
   animation: track-marquee var(--marquee-duration, 40s) linear infinite;
   animation-delay: var(--marquee-delay, 0s);
-  will-change: transform;
 }
 
 .track--marquee::-webkit-scrollbar {
   display: none;
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .track--marquee:has(.slide:hover),
-  .track--marquee:has(.slide:focus-within) {
-    animation-play-state: paused;
-  }
+/* Phone: swipe row, no transform animation */
+.track--static {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  padding-bottom: 0.5rem;
+  touch-action: pan-x pan-y;
+  pointer-events: auto;
+  scrollbar-width: none;
+  animation: none;
+  transform: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.track--static::-webkit-scrollbar {
+  display: none;
 }
 
 .track::-webkit-scrollbar {
@@ -2100,36 +2125,49 @@ body.is-en .slide-offer-badge {
   border: var(--border-subtle);
   border-radius: var(--radius-max);
   overflow: hidden;
-  transform-origin: center center;
   touch-action: pan-y;
+  pointer-events: auto;
   transition:
-    transform 0.55s var(--ease-prestige),
-    border-color 0.55s var(--ease-prestige),
-    box-shadow 0.55s var(--ease-prestige),
-    z-index 0s;
+    border-color 0.4s var(--ease-prestige),
+    box-shadow 0.4s var(--ease-prestige);
 }
 
+/* Desktop: hover hotline + highlight — marquee keeps moving, page scroll unaffected */
 @media (hover: hover) and (pointer: fine) {
-  .track .slide:hover,
-  .track .slide:focus-within {
-    z-index: 3;
-    overflow: hidden;
-    transform: scale(1.08);
+  .track .slide {
+    cursor: default;
+  }
+
+  .track .slide:not(.slide--offer):hover {
+    z-index: 2;
     border-color: rgba(139, 35, 35, 0.85);
     box-shadow:
-      0 24px 48px rgba(0, 0, 0, 0.55),
-      0 0 0 1px rgba(139, 35, 35, 0.45),
-      0 0 36px var(--accent-glow);
+      0 14px 32px rgba(0, 0, 0, 0.45),
+      0 0 0 1px rgba(139, 35, 35, 0.4),
+      0 0 28px var(--accent-glow);
+  }
+
+  .track .slide:not(.slide--offer):hover .slide-media img {
+    transform: scale(1.05);
+  }
+
+  .track .slide:not(.slide--offer):hover .slide-order-overlay {
+    opacity: 1;
+  }
+
+  .track .slide--offer:hover {
+    z-index: 2;
+    border-color: rgba(139, 35, 35, 0.85);
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.45);
+    cursor: pointer;
   }
 }
 
 .track .slide.is-order-open {
-  z-index: 3;
-  overflow: hidden;
-  transform: scale(1.03);
+  z-index: 2;
   border-color: rgba(139, 35, 35, 0.85);
   box-shadow:
-    0 16px 32px rgba(0, 0, 0, 0.45),
+    0 14px 32px rgba(0, 0, 0, 0.45),
     0 0 0 1px rgba(139, 35, 35, 0.45),
     0 0 28px var(--accent-glow);
 }
@@ -2163,13 +2201,6 @@ body.is-en .slide-offer-badge {
   object-fit: cover;
   object-position: center;
   transition: transform 0.7s var(--ease-prestige);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .track .slide:hover .slide-media img,
-  .track .slide:focus-within .slide-media img {
-    transform: scale(1.04);
-  }
 }
 
 .slide-order-overlay {
@@ -2219,13 +2250,6 @@ body.is-en .slide-offer-badge {
 .slide-order-btn strong {
   font-weight: 700;
   letter-spacing: 0.06em;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .track .slide:hover .slide-order-overlay,
-  .track .slide:focus-within .slide-order-overlay {
-    opacity: 1;
-  }
 }
 
 .track .slide.is-order-open .slide-order-overlay {
@@ -2625,13 +2649,11 @@ body.is-en .footer-tagline {
   color: var(--text-muted);
 }
 
-/* Lightbox — fixed body lock avoids iOS breaking menu transforms */
+/* Lightbox scroll lock — no position:fixed on body (breaks iOS menu rendering) */
+html.is-lightbox-open,
 body.is-lightbox-open {
-  position: fixed;
-  width: 100%;
-  left: 0;
-  right: 0;
   overflow: hidden;
+  height: 100%;
 }
 
 /* Lightbox */

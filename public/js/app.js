@@ -358,14 +358,16 @@
         .querySelectorAll(".slide:not(.slide--offer)")
         .forEach(addSlideOrderOverlay);
 
-      if (reduced) {
-        return;
-      }
-
       const viewport = document.createElement("div");
       viewport.className = "track-viewport";
       track.parentNode.insertBefore(viewport, track);
       viewport.appendChild(track);
+
+      /* Mobile + reduced motion: no CSS transform marquee (iOS Safari makes cards vanish) */
+      if (reduced || isMobile) {
+        track.classList.add("track--static");
+        return;
+      }
 
       const originals = [...track.querySelectorAll(".slide")];
       const minLoopSlides = 8;
@@ -403,35 +405,15 @@
 
     applySiteConfig();
     initSlideOrderTap();
-    initTrackWheelScroll();
   }
 
-  /* Desktop: wheel over menu cards must scroll the page, not trap in a row */
-  function initTrackWheelScroll() {
-    const canHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-    if (!canHover) return;
-
-    const menu = document.getElementById("menu");
-    if (!menu) return;
-
-    menu.addEventListener(
-      "wheel",
-      (e) => {
-        if (!e.target.closest(".track-viewport, .track, .slide")) return;
-        const dy = e.deltaY;
-        const dx = e.deltaX;
-        if (Math.abs(dy) < 0.5) return;
-        if (Math.abs(dy) < Math.abs(dx)) return;
-
-        window.scrollBy({ top: dy, left: 0, behavior: "auto" });
-        e.preventDefault();
-        e.stopImmediatePropagation();
-      },
-      { passive: false, capture: true }
-    );
+  function closeMenuOrderOverlays() {
+    document.querySelectorAll(".track .slide.is-order-open").forEach((s) => {
+      s.classList.remove("is-order-open");
+    });
   }
 
-  /* Touch: tap to show hotline; ignore taps that were scrolls */
+  /* Touch: tap to show hotline (static rows on phone — no clone sync) */
   function initSlideOrderTap() {
     const coarse = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
     if (!coarse) return;
@@ -439,36 +421,8 @@
     const menu = document.getElementById("menu");
     if (!menu) return;
 
-    const TAP_MOVE_THRESHOLD = 14;
+    const TAP_MOVE_THRESHOLD = 12;
     const touchStarts = new WeakMap();
-
-    const closeAll = () => {
-      menu.querySelectorAll(".track .slide.is-order-open").forEach((s) => {
-        s.classList.remove("is-order-open");
-      });
-    };
-
-    const syncOpenState = (slide, open) => {
-      const track = slide.closest(".track");
-      if (!track) return;
-      const slides = [...track.querySelectorAll(".slide")];
-      const index = slides.indexOf(slide);
-      if (index < 0) return;
-      const originals = slides.filter(
-        (s) => !s.classList.contains("slide--clone") && !s.classList.contains("slide--repeat")
-      );
-      const original = originals[index % originals.length];
-      if (!original) return;
-
-      closeAll();
-      if (open) {
-        slides.forEach((s, i) => {
-          if (i % originals.length === index % originals.length) {
-            s.classList.add("is-order-open");
-          }
-        });
-      }
-    };
 
     menu.addEventListener(
       "touchstart",
@@ -477,7 +431,7 @@
         if (!slide) return;
         const t = e.touches[0];
         if (!t) return;
-        touchStarts.set(slide, { x: t.clientX, y: t.clientY });
+        touchStarts.set(slide, { x: t.clientX, y: t.clientY, time: Date.now() });
       },
       { passive: true }
     );
@@ -486,11 +440,7 @@
       "touchend",
       (e) => {
         const slide = e.target.closest(".track .slide:not(.slide--offer)");
-        if (!slide) {
-          if (!e.target.closest(".track .slide")) closeAll();
-          return;
-        }
-
+        if (!slide) return;
         if (e.target.closest("a.slide-order-btn")) return;
 
         const start = touchStarts.get(slide);
@@ -499,22 +449,27 @@
 
         const t = e.changedTouches[0];
         if (!t) return;
-        const movedX = Math.abs(t.clientX - start.x);
-        const movedY = Math.abs(t.clientY - start.y);
-        if (movedX > TAP_MOVE_THRESHOLD || movedY > TAP_MOVE_THRESHOLD) return;
+        if (
+          Math.abs(t.clientX - start.x) > TAP_MOVE_THRESHOLD ||
+          Math.abs(t.clientY - start.y) > TAP_MOVE_THRESHOLD
+        ) {
+          return;
+        }
 
-        e.stopPropagation();
+        e.preventDefault();
         const wasOpen = slide.classList.contains("is-order-open");
-        syncOpenState(slide, !wasOpen);
+        closeMenuOrderOverlays();
+        if (!wasOpen) slide.classList.add("is-order-open");
       },
-      { passive: true }
+      { passive: false }
     );
 
     document.addEventListener(
-      "touchend",
+      "touchstart",
       (e) => {
         if (e.target.closest("#menu .track .slide")) return;
-        closeAll();
+        if (e.target.closest("#lightbox")) return;
+        closeMenuOrderOverlays();
       },
       { passive: true }
     );
@@ -620,40 +575,31 @@
         descEl.textContent = isAr ? card.dataset.offerDescAr || "" : card.dataset.offerDescEn || "";
       }
 
+      closeMenuOrderOverlays();
       scrollLockY = window.scrollY;
       lightbox.hidden = false;
       lightbox.setAttribute("aria-hidden", "false");
+      document.documentElement.classList.add("is-lightbox-open");
       document.body.classList.add("is-lightbox-open");
-      document.body.style.top = `-${scrollLockY}px`;
       lightbox.querySelector(".lightbox-close")?.focus();
     };
 
     const close = () => {
       lightbox.hidden = true;
       lightbox.setAttribute("aria-hidden", "true");
+      document.documentElement.classList.remove("is-lightbox-open");
       document.body.classList.remove("is-lightbox-open");
-      document.body.style.top = "";
       window.scrollTo(0, scrollLockY);
       if (img) img.src = "";
       lightboxLastFocus?.focus();
     };
 
-    const isTouchUi = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
-
     document.querySelectorAll("[data-lightbox][data-offer-title-en]").forEach((card) => {
-      const activate = () => open(card);
-      if (isTouchUi) {
-        card.addEventListener(
-          "touchend",
-          (e) => {
-            e.preventDefault();
-            activate();
-          },
-          { passive: false }
-        );
-      } else {
-        card.addEventListener("click", activate);
-      }
+      const activate = (e) => {
+        if (e?.target?.closest?.("a.slide-order-btn")) return;
+        open(card);
+      };
+      card.addEventListener("click", activate);
       if (card.classList.contains("slide--offer")) {
         card.addEventListener("keydown", (e) => {
           if (e.key === "Enter" || e.key === " ") {
