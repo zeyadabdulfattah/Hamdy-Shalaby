@@ -13,7 +13,10 @@
     phone: "17069",
     phoneDisplay: "17069",
     whatsapp: "966500000000",
+    orderApiUrl: null,
   };
+
+  window.HamdySiteConfig = SITE_CONFIG;
 
   const html = document.documentElement;
   const body = document.body;
@@ -85,6 +88,8 @@
     });
 
     updateLangToggle(lang);
+    refreshSlideCartLabels();
+    window.HamdyOrder?.refreshAllSlidePrices?.();
 
     const metaDesc = document.querySelector('meta[name="description"]');
     if (metaDesc) {
@@ -93,6 +98,7 @@
     }
 
     setStoredLang(lang);
+    document.dispatchEvent(new CustomEvent("hamdy-lang-change", { detail: { lang } }));
   }
 
   function updateLangToggle(lang) {
@@ -307,41 +313,62 @@
     return media;
   }
 
-  function addSlideOrderOverlay(slide) {
+  function addSlideCartActions(slide) {
     const media = wrapSlideMedia(slide);
-    if (!media || media.querySelector(".slide-order-overlay")) return;
+    if (!media || media.querySelector(".slide-actions")) return;
 
-    const lang = currentLang;
-    const overlay = document.createElement("div");
-    overlay.className = "slide-order-overlay";
+    window.HamdyOrder?.ensureSlidePrice(slide);
 
-    const inner = document.createElement("div");
-    inner.className = "slide-order-overlay__inner";
+    const actions = document.createElement("div");
+    actions.className = "slide-actions";
 
-    const msg = document.createElement("p");
-    msg.className = "slide-order-msg";
-    msg.setAttribute("data-en", "Order it now from the hotline");
-    msg.setAttribute("data-ar", "اطلبه الآن من الخط الساخن");
-    msg.textContent = msg.getAttribute(`data-${lang}`) || msg.getAttribute("data-ar");
+    const addBtn = document.createElement("button");
+    addBtn.type = "button";
+    addBtn.className = "slide-add-btn";
+    addBtn.setAttribute("aria-label", currentLang === "ar" ? "أضف للطلب" : "Add to your order");
+    addBtn.innerHTML =
+      '<svg class="slide-add-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
 
-    const btn = document.createElement("a");
-    btn.className = "btn btn--accent btn--sm slide-order-btn";
-    btn.setAttribute("data-phone-href", "");
-    btn.href = `tel:${SITE_CONFIG.phone.replace(/\s/g, "")}`;
+    const detailsBtn = document.createElement("button");
+    detailsBtn.type = "button";
+    detailsBtn.className = "slide-details-btn";
+    detailsBtn.setAttribute("data-en", "View details");
+    detailsBtn.setAttribute("data-ar", "التفاصيل");
+    detailsBtn.textContent =
+      detailsBtn.getAttribute(`data-${currentLang}`) || detailsBtn.getAttribute("data-ar");
 
-    const btnLabel = document.createElement("span");
-    btnLabel.setAttribute("data-en", "Call Hotline");
-    btnLabel.setAttribute("data-ar", "اتصل بالخط الساخن");
-    btnLabel.textContent = btnLabel.getAttribute(`data-${lang}`) || btnLabel.getAttribute("data-ar");
+    actions.append(addBtn, detailsBtn);
+    media.appendChild(actions);
+  }
 
-    const btnNum = document.createElement("strong");
-    btnNum.setAttribute("data-phone-display", "");
-    btnNum.textContent = SITE_CONFIG.phoneDisplay;
+  function initSlideActionDelegation() {
+    const menu = document.getElementById("menu");
+    if (!menu || menu.dataset.slideActionsBound) return;
+    menu.dataset.slideActionsBound = "true";
 
-    btn.append(btnLabel, document.createTextNode(" "), btnNum);
-    inner.append(msg, btn);
-    overlay.append(inner);
-    media.appendChild(overlay);
+    menu.addEventListener("click", (e) => {
+      const addBtn = e.target.closest(".slide-add-btn");
+      const detailsBtn = e.target.closest(".slide-details-btn");
+      if (!addBtn && !detailsBtn) return;
+
+      const slide = (addBtn || detailsBtn).closest(".slide");
+      if (!slide) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (addBtn) {
+        window.HamdyOrder?.addItem(slide);
+      } else {
+        window.HamdyOrder?.openProductDetail(slide);
+      }
+    });
+  }
+
+  function refreshSlideCartLabels() {
+    document.querySelectorAll(".slide-details-btn[data-en][data-ar]").forEach((btn) => {
+      btn.textContent = btn.getAttribute(`data-${currentLang}`) || btn.getAttribute("data-ar");
+    });
   }
 
   /* ——— Menu tracks: continuous marquee ——— */
@@ -354,9 +381,7 @@
       if (!track) return;
 
       track.querySelectorAll(".slide").forEach(wrapSlideMedia);
-      track
-        .querySelectorAll(".slide:not(.slide--offer)")
-        .forEach(addSlideOrderOverlay);
+      track.querySelectorAll(".slide").forEach(addSlideCartActions);
 
       const viewport = document.createElement("div");
       viewport.className = "track-viewport";
@@ -404,75 +429,11 @@
     });
 
     applySiteConfig();
-    initSlideOrderTap();
+    initSlideActionDelegation();
   }
 
   function closeMenuOrderOverlays() {
-    document.querySelectorAll(".track .slide.is-order-open").forEach((s) => {
-      s.classList.remove("is-order-open");
-    });
-  }
-
-  /* Touch: tap to show hotline (static rows on phone — no clone sync) */
-  function initSlideOrderTap() {
-    const coarse = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
-    if (!coarse) return;
-
-    const menu = document.getElementById("menu");
-    if (!menu) return;
-
-    const TAP_MOVE_THRESHOLD = 12;
-    const touchStarts = new WeakMap();
-
-    menu.addEventListener(
-      "touchstart",
-      (e) => {
-        const slide = e.target.closest(".track .slide:not(.slide--offer)");
-        if (!slide) return;
-        const t = e.touches[0];
-        if (!t) return;
-        touchStarts.set(slide, { x: t.clientX, y: t.clientY, time: Date.now() });
-      },
-      { passive: true }
-    );
-
-    menu.addEventListener(
-      "touchend",
-      (e) => {
-        const slide = e.target.closest(".track .slide:not(.slide--offer)");
-        if (!slide) return;
-        if (e.target.closest("a.slide-order-btn")) return;
-
-        const start = touchStarts.get(slide);
-        touchStarts.delete(slide);
-        if (!start) return;
-
-        const t = e.changedTouches[0];
-        if (!t) return;
-        if (
-          Math.abs(t.clientX - start.x) > TAP_MOVE_THRESHOLD ||
-          Math.abs(t.clientY - start.y) > TAP_MOVE_THRESHOLD
-        ) {
-          return;
-        }
-
-        e.preventDefault();
-        const wasOpen = slide.classList.contains("is-order-open");
-        closeMenuOrderOverlays();
-        if (!wasOpen) slide.classList.add("is-order-open");
-      },
-      { passive: false }
-    );
-
-    document.addEventListener(
-      "touchstart",
-      (e) => {
-        if (e.target.closest("#menu .track .slide")) return;
-        if (e.target.closest("#lightbox")) return;
-        closeMenuOrderOverlays();
-      },
-      { passive: true }
-    );
+    /* legacy no-op */
   }
 
   /* ——— FAQ accordion ——— */
@@ -530,94 +491,9 @@
     );
   }
 
-  /* ——— Lightbox ——— */
+  /* ——— Lightbox (legacy — offers use product detail now) ——— */
   function initLightbox() {
-    const lightbox = document.getElementById("lightbox");
-    if (!lightbox) return;
-
-    const img = lightbox.querySelector(".lightbox-img");
-    const titleEl = lightbox.querySelector(".lightbox-title");
-    const descEl = lightbox.querySelector(".lightbox-desc");
-    const focusableSelector = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
-    let scrollLockY = 0;
-
-    const trapFocus = (e) => {
-      if (e.key !== "Tab" || lightbox.hidden) return;
-      const focusables = [...lightbox.querySelectorAll(focusableSelector)].filter(
-        (el) => !el.disabled && el.offsetParent !== null
-      );
-      if (!focusables.length) return;
-      const first = focusables[0];
-      const last = focusables[focusables.length - 1];
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault();
-        last.focus();
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault();
-        first.focus();
-      }
-    };
-
-    const open = (card) => {
-      const src = card.dataset.lightbox;
-      if (!src || !img) return;
-
-      lightboxLastFocus = document.activeElement;
-      const isAr = currentLang === "ar";
-
-      img.src = src;
-      img.alt = isAr ? card.dataset.offerTitleAr || "" : card.dataset.offerTitleEn || "";
-
-      if (titleEl) {
-        titleEl.textContent = isAr ? card.dataset.offerTitleAr || "" : card.dataset.offerTitleEn || "";
-      }
-      if (descEl) {
-        descEl.textContent = isAr ? card.dataset.offerDescAr || "" : card.dataset.offerDescEn || "";
-      }
-
-      closeMenuOrderOverlays();
-      scrollLockY = window.scrollY;
-      lightbox.hidden = false;
-      lightbox.setAttribute("aria-hidden", "false");
-      document.documentElement.classList.add("is-lightbox-open");
-      document.body.classList.add("is-lightbox-open");
-      lightbox.querySelector(".lightbox-close")?.focus();
-    };
-
-    const close = () => {
-      lightbox.hidden = true;
-      lightbox.setAttribute("aria-hidden", "true");
-      document.documentElement.classList.remove("is-lightbox-open");
-      document.body.classList.remove("is-lightbox-open");
-      window.scrollTo(0, scrollLockY);
-      if (img) img.src = "";
-      lightboxLastFocus?.focus();
-    };
-
-    document.querySelectorAll("[data-lightbox][data-offer-title-en]").forEach((card) => {
-      const activate = (e) => {
-        if (e?.target?.closest?.("a.slide-order-btn")) return;
-        open(card);
-      };
-      card.addEventListener("click", activate);
-      if (card.classList.contains("slide--offer")) {
-        card.addEventListener("keydown", (e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            activate();
-          }
-        });
-      }
-    });
-
-    lightbox.querySelectorAll("[data-lightbox-close]").forEach((el) => {
-      el.addEventListener("click", close);
-    });
-
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && !lightbox.hidden) close();
-      trapFocus(e);
-    });
+    /* Offer lightbox disabled — View details + Your Order handles all menu items */
   }
 
   /* ——— Footer year ——— */
