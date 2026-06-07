@@ -15,6 +15,7 @@
       --text: #f5f5f5; --muted: #888888; --border: #2a2a2a;
     }
     html { scroll-behavior: smooth; }
+    @media (max-width: 600px) { html { scroll-behavior: auto; } }
     body {
       min-height: 100vh; background: var(--bg); color: var(--text);
       font-family: "Cairo", sans-serif; font-weight: 400; line-height: 1.6;
@@ -141,8 +142,12 @@
     .player {
       position: relative; width: 100%; aspect-ratio: 16 / 9;
       border-radius: 10px; overflow: hidden; background: #000; cursor: pointer;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
     }
-    .player__video { display: block; width: 100%; height: 100%; object-fit: cover; background: #000; }
+    .player__video {
+      display: block; width: 100%; height: 100%; object-fit: contain; background: #000;
+    }
     .player__overlay {
       position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
       background: rgba(0,0,0,0.35); transition: opacity 0.35s ease, visibility 0.35s ease;
@@ -164,8 +169,12 @@
       position: absolute; inset-inline: 0; bottom: 0; padding: 2.5rem 1rem 0.875rem;
       background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%);
       opacity: 0; transform: translateY(6px); transition: opacity 0.3s ease, transform 0.3s ease;
+      pointer-events: none;
     }
-    .player:hover .player__controls, .player.is-paused .player__controls, .player:focus-within .player__controls {
+    .player__controls.is-visible {
+      opacity: 1; transform: translateY(0); pointer-events: auto;
+    }
+    .player:hover .player__controls.is-visible, .player.is-paused .player__controls.is-visible, .player:focus-within .player__controls.is-visible {
       opacity: 1; transform: translateY(0);
     }
     .player__progress {
@@ -177,6 +186,8 @@
     .player__btn {
       appearance: none; border: 0; background: transparent; color: var(--text);
       cursor: pointer; padding: 0.25rem; display: flex; align-items: center; justify-content: center;
+      touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+      min-width: 2.75rem; min-height: 2.75rem;
     }
     .player__btn:hover, .player__btn:focus-visible { color: var(--green); outline: none; }
     .player__btn svg { width: 18px; height: 18px; fill: currentColor; }
@@ -210,6 +221,7 @@
       text-decoration: none; text-align: center; cursor: pointer;
       transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, border-color 0.25s ease;
       flex: 1 1 280px; max-width: 100%;
+      touch-action: manipulation; -webkit-tap-highlight-color: transparent;
     }
     .btn--primary { background: var(--green); color: #000; border: 2px solid var(--green); }
     .btn--primary:hover, .btn--primary:focus-visible {
@@ -227,6 +239,16 @@
     }
     @media (max-width: 600px) {
       .deal-room { padding: 2rem 1.25rem 3rem; }
+      body::before { display: none; }
+      .video-card { box-shadow: 0 4px 20px rgba(0,0,0,0.45); }
+      .player__play { backdrop-filter: none; background: rgba(5,5,5,0.82); }
+      .player__controls {
+        opacity: 1; transform: none; pointer-events: auto;
+        padding-bottom: max(0.875rem, env(safe-area-inset-bottom));
+      }
+      .player.is-playing .player__controls:not(.is-visible) {
+        opacity: 0; pointer-events: none;
+      }
       .brand-lockup {
         column-gap: 0.35rem;
         max-width: 100%;
@@ -285,7 +307,8 @@
         <div class="player" id="player">
           <video class="player__video" id="proposal-video"
             poster="../images-logo/logo.png"
-            preload="metadata" playsinline
+            preload="metadata" playsinline webkit-playsinline
+            x-webkit-airplay="allow"
             aria-label="Confirm It × Hamdy Shalaby — Website Walkthrough">
             <source src="../images-videodemo/video-demo.MP4" type="video/mp4">
           </video>
@@ -296,7 +319,7 @@
             </div>
           </div>
 
-          <div class="player__controls">
+          <div class="player__controls" id="player-controls">
             <div class="player__progress" id="progress-bar" role="slider" aria-label="تقدم الفيديو" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
               <div class="player__progress-fill" id="progress-fill"></div>
             </div>
@@ -344,6 +367,7 @@
       var player = document.getElementById("player");
       var video = document.getElementById("proposal-video");
       var overlay = document.getElementById("player-overlay");
+      var controls = document.getElementById("player-controls");
       var btnPlay = document.getElementById("btn-play");
       var iconPlay = document.getElementById("icon-play");
       var iconPause = document.getElementById("icon-pause");
@@ -351,6 +375,9 @@
       var progressFill = document.getElementById("progress-fill");
       var timeDisplay = document.getElementById("time-display");
       var btnFullscreen = document.getElementById("btn-fullscreen");
+      var isTouch = window.matchMedia("(max-width: 600px), (hover: none)").matches;
+      var controlsTimer = null;
+      var rafPending = false;
 
       function formatTime(seconds) {
         if (!isFinite(seconds)) return "0:00";
@@ -360,10 +387,15 @@
       }
 
       function updateTime() {
-        timeDisplay.textContent = formatTime(video.currentTime) + " / " + formatTime(video.duration);
-        var pct = video.duration ? (video.currentTime / video.duration) * 100 : 0;
-        progressFill.style.width = pct + "%";
-        progressBar.setAttribute("aria-valuenow", Math.round(pct));
+        if (rafPending) return;
+        rafPending = true;
+        requestAnimationFrame(function () {
+          rafPending = false;
+          timeDisplay.textContent = formatTime(video.currentTime) + " / " + formatTime(video.duration);
+          var pct = video.duration ? (video.currentTime / video.duration) * 100 : 0;
+          progressFill.style.width = pct + "%";
+          progressBar.setAttribute("aria-valuenow", Math.round(pct));
+        });
       }
 
       function setPlaying(playing) {
@@ -372,33 +404,91 @@
         iconPlay.hidden = playing;
         iconPause.hidden = !playing;
         btnPlay.setAttribute("aria-label", playing ? "إيقاف مؤقت" : "تشغيل");
+        if (playing && isTouch) showControlsTemporarily();
+        else if (!playing && isTouch) controls.classList.add("is-visible");
+      }
+
+      function showControlsTemporarily() {
+        controls.classList.add("is-visible");
+        clearTimeout(controlsTimer);
+        if (!video.paused) {
+          controlsTimer = setTimeout(function () {
+            controls.classList.remove("is-visible");
+          }, 3200);
+        }
       }
 
       function togglePlay() {
         if (video.paused) video.play(); else video.pause();
       }
 
-      overlay.addEventListener("click", togglePlay);
-      btnPlay.addEventListener("click", function (e) { e.stopPropagation(); togglePlay(); });
-      player.addEventListener("click", function (e) {
-        if (e.target.closest(".player__controls") || e.target.closest(".player__overlay")) return;
-        togglePlay();
-      });
-      video.addEventListener("play", function () { setPlaying(true); });
-      video.addEventListener("pause", function () { setPlaying(false); });
-      video.addEventListener("timeupdate", updateTime);
-      video.addEventListener("loadedmetadata", updateTime);
-      progressBar.addEventListener("click", function (e) {
+      function seekFromClientX(clientX) {
         if (!video.duration) return;
         var rect = progressBar.getBoundingClientRect();
-        var ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+        var ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
         video.currentTime = ratio * video.duration;
-      });
+      }
+
+      function toggleFullscreen() {
+        var fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+        if (fsEl) {
+          if (document.exitFullscreen) document.exitFullscreen();
+          else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+          return;
+        }
+        if (video.webkitEnterFullscreen) {
+          video.webkitEnterFullscreen();
+          return;
+        }
+        if (video.requestFullscreen) {
+          video.requestFullscreen();
+          return;
+        }
+        if (player.requestFullscreen) player.requestFullscreen();
+        else if (player.webkitRequestFullscreen) player.webkitRequestFullscreen();
+      }
+
+      overlay.addEventListener("click", togglePlay);
+      btnPlay.addEventListener("click", function (e) { e.stopPropagation(); togglePlay(); });
       btnFullscreen.addEventListener("click", function (e) {
         e.stopPropagation();
-        if (document.fullscreenElement) document.exitFullscreen();
-        else if (player.requestFullscreen) player.requestFullscreen();
+        toggleFullscreen();
       });
+
+      player.addEventListener("click", function (e) {
+        if (e.target.closest(".player__controls") || e.target.closest(".player__overlay")) return;
+        if (isTouch && !video.paused) {
+          showControlsTemporarily();
+          return;
+        }
+        togglePlay();
+      });
+
+      if (isTouch) {
+        controls.classList.add("is-visible");
+        player.addEventListener("touchstart", function () {
+          if (!video.paused) showControlsTemporarily();
+        }, { passive: true });
+      }
+
+      progressBar.addEventListener("click", function (e) {
+        e.stopPropagation();
+        seekFromClientX(e.clientX);
+      });
+      progressBar.addEventListener("touchstart", function (e) {
+        e.stopPropagation();
+        if (e.touches[0]) seekFromClientX(e.touches[0].clientX);
+      }, { passive: true });
+
+      video.addEventListener("play", function () { setPlaying(true); });
+      video.addEventListener("pause", function () {
+        setPlaying(false);
+        clearTimeout(controlsTimer);
+        controls.classList.add("is-visible");
+      });
+      video.addEventListener("timeupdate", updateTime);
+      video.addEventListener("loadedmetadata", updateTime);
+      video.addEventListener("webkitendfullscreen", function () { setPlaying(false); });
     })();
   </script>
 </body>
