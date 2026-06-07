@@ -118,11 +118,17 @@
       gap: 0.65rem; margin-bottom: 1rem; flex-wrap: wrap;
     }
     .video-section__title {
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
       font-weight: 700;
       font-size: clamp(0.8rem, 2.5vw, 0.9rem);
       letter-spacing: 0.1em;
       text-transform: uppercase;
       color: var(--muted);
+      direction: ltr;
+      margin: 0;
+    }
+    .video-section__title-icon {
+      width: 0.85rem; height: 0.85rem; fill: var(--green); flex-shrink: 0;
     }
     .video-section__badge {
       font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
@@ -150,26 +156,40 @@
     }
     .player__overlay {
       position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-      background: rgba(0,0,0,0.35); transition: opacity 0.35s ease, visibility 0.35s ease;
+      background: rgba(0,0,0,0.35);
+      transition: opacity 0.25s ease;
+      z-index: 2;
     }
-    .player.is-playing .player__overlay { opacity: 0; visibility: hidden; pointer-events: none; }
+    .player.has-started .player__overlay {
+      display: none;
+    }
+    .player.is-playing:not(.has-started) .player__overlay {
+      opacity: 0; pointer-events: none;
+    }
     .player__play {
-      width: 72px; height: 72px; border-radius: 50%;
-      border: 2px solid rgba(255,255,255,0.25); background: rgba(5,5,5,0.65);
-      backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center;
-      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-      box-shadow: 0 0 0 8px rgba(37,211,102,0.12);
+      width: 68px; height: 68px; border-radius: 50%;
+      border: 2px solid rgba(37, 211, 102, 0.55);
+      background: rgba(5, 5, 5, 0.78);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 0 6px rgba(37, 211, 102, 0.1);
+      flex-shrink: 0;
     }
-    .player:hover .player__play, .player:focus-within .player__play {
-      transform: scale(1.06); border-color: var(--green);
-      box-shadow: 0 0 0 12px rgba(37,211,102,0.18);
+    @media (hover: hover) {
+      .player__play { transition: transform 0.2s ease, border-color 0.2s ease; }
+      .player:not(.has-started):hover .player__play {
+        transform: scale(1.05); border-color: var(--green);
+      }
     }
-    .player__play svg { width: 28px; height: 28px; fill: var(--green); margin-inline-start: 4px; }
+    .player__play svg {
+      width: 26px; height: 26px; fill: var(--green);
+      display: block; margin-left: 3px;
+    }
     .player__controls {
       position: absolute; inset-inline: 0; bottom: 0; padding: 2.5rem 1rem 0.875rem;
       background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%);
       opacity: 0; transform: translateY(6px); transition: opacity 0.3s ease, transform 0.3s ease;
       pointer-events: none;
+      direction: ltr;
     }
     .player__controls.is-visible {
       opacity: 1; transform: translateY(0); pointer-events: auto;
@@ -182,18 +202,32 @@
       background: rgba(255,255,255,0.15); border-radius: 999px; cursor: pointer; overflow: hidden;
     }
     .player__progress-fill { height: 100%; width: 0%; background: var(--green); border-radius: 999px; }
-    .player__bar { display: flex; align-items: center; gap: 0.75rem; }
+    .player__bar { display: flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; }
     .player__btn {
       appearance: none; border: 0; background: transparent; color: var(--text);
-      cursor: pointer; padding: 0.25rem; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; padding: 0; display: inline-flex; align-items: center; justify-content: center;
       touch-action: manipulation; -webkit-tap-highlight-color: transparent;
-      min-width: 2.75rem; min-height: 2.75rem;
+      width: 2.75rem; height: 2.75rem; flex-shrink: 0; position: relative;
     }
+    .player__btn--toggle {
+      border-radius: 50%;
+      border: 1.5px solid rgba(255, 255, 255, 0.28);
+      background: rgba(0, 0, 0, 0.35);
+    }
+    .player__btn-icon {
+      position: absolute; inset: 0; margin: auto;
+      width: 16px; height: 16px; fill: var(--green); display: block;
+    }
+    .player__btn-icon--play { margin-left: 2px; }
+    .player__btn-icon[hidden] { display: none !important; }
     .player__btn:hover, .player__btn:focus-visible { color: var(--green); outline: none; }
-    .player__btn svg { width: 18px; height: 18px; fill: currentColor; }
+    .player__btn--toggle:hover, .player__btn--toggle:focus-visible { border-color: var(--green); }
+    .player__btn svg:not(.player__btn-icon) {
+      width: 18px; height: 18px; fill: currentColor; display: block;
+    }
     .player__time {
       font-size: 0.75rem; color: rgba(255,255,255,0.75); font-variant-numeric: tabular-nums;
-      min-width: 7rem; direction: ltr; text-align: start;
+      flex: 1; min-width: 0; direction: ltr; text-align: center; line-height: 1;
     }
     .player__spacer { flex: 1; }
     .video-card__footer {
@@ -203,24 +237,30 @@
     }
     .video-card__caption { font-size: 0.8rem; color: var(--muted); }
     .btn-download-video {
-      display: inline-flex; align-items: center; gap: 0.5rem;
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
       font-family: "Cairo", sans-serif; font-weight: 700; font-size: 0.8rem;
-      color: var(--text); text-decoration: none; padding: 0.5rem 0.875rem;
+      color: var(--text); text-decoration: none; padding: 0.625rem 0.875rem;
       border-radius: 6px; border: 1px solid var(--border); background: rgba(255,255,255,0.03);
       transition: transform 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+      line-height: 1.2; white-space: nowrap;
     }
-    .btn-download-video svg { width: 16px; height: 16px; fill: var(--green); }
+    .btn-download-video svg {
+      width: 16px; height: 16px; fill: var(--green); display: block; flex-shrink: 0;
+    }
     .btn-download-video:hover, .btn-download-video:focus-visible {
       transform: translateY(-2px); border-color: var(--green); color: var(--green); outline: none;
     }
-    .deal-room__actions { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 2rem; justify-content: center; }
+    .deal-room__actions {
+      display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 2rem;
+      justify-content: center; align-items: stretch; width: 100%;
+    }
     .btn {
       display: inline-flex; align-items: center; justify-content: center;
-      min-height: 52px; padding: 0.875rem 1.5rem; border-radius: 8px;
+      min-height: 52px; padding: 0.875rem 1.25rem; border-radius: 8px;
       font-family: "Cairo", sans-serif; font-weight: 700; font-size: 0.95rem;
       text-decoration: none; text-align: center; cursor: pointer;
       transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, border-color 0.25s ease;
-      flex: 1 1 280px; max-width: 100%;
+      flex: 1 1 280px; max-width: 100%; line-height: 1.45;
       touch-action: manipulation; -webkit-tap-highlight-color: transparent;
     }
     .btn--primary { background: var(--green); color: #000; border: 2px solid var(--green); }
@@ -241,14 +281,18 @@
       .deal-room { padding: 2rem 1.25rem 3rem; }
       body::before { display: none; }
       .video-card { box-shadow: 0 4px 20px rgba(0,0,0,0.45); }
-      .player__play { backdrop-filter: none; background: rgba(5,5,5,0.82); }
+      .player__play { width: 64px; height: 64px; }
+      .player__play svg { width: 24px; height: 24px; margin-left: 2px; }
+      .player__btn--toggle { width: 2.5rem; height: 2.5rem; }
       .player__controls {
         opacity: 1; transform: none; pointer-events: auto;
+        padding-inline: 0.65rem;
         padding-bottom: max(0.875rem, env(safe-area-inset-bottom));
       }
       .player.is-playing .player__controls:not(.is-visible) {
         opacity: 0; pointer-events: none;
       }
+      .player__time { font-size: 0.68rem; }
       .brand-lockup {
         column-gap: 0.35rem;
         max-width: 100%;
@@ -265,10 +309,21 @@
         font-size: 1.35rem;
         opacity: 0.6;
       }
-      .deal-room__actions { flex-direction: column; }
-      .btn { flex: 1 1 auto; width: 100%; }
-      .player__play { width: 60px; height: 60px; }
-      .player__play svg { width: 24px; height: 24px; }
+      .deal-room__actions { flex-direction: column; gap: 0.75rem; }
+      .btn {
+        flex: 1 1 auto; width: 100%; max-width: 100%;
+        font-size: 0.88rem; padding: 0.875rem 1rem;
+      }
+      .video-section__label {
+        flex-direction: column; gap: 0.5rem; margin-bottom: 0.875rem;
+      }
+      .video-section__title { font-size: 0.78rem; letter-spacing: 0.08em; }
+      .video-card__footer {
+        flex-direction: column; align-items: stretch; text-align: center;
+        gap: 0.75rem; padding-top: 0.75rem;
+      }
+      .video-card__caption { width: 100%; line-height: 1.5; }
+      .btn-download-video { width: 100%; min-height: 44px; white-space: normal; }
     }
     @media (prefers-reduced-motion: reduce) {
       .deal-room__header, .deal-room__video, .deal-room__actions, .deal-room__footer {
@@ -299,7 +354,10 @@
 
     <section class="deal-room__video" aria-label="Watch video demo">
       <div class="video-section__label">
-        <p class="video-section__title">▶ Video Demo</p>
+        <p class="video-section__title">
+          <svg class="video-section__title-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+          <span>Video Demo</span>
+        </p>
         <span class="video-section__badge">Watch Now</span>
       </div>
 
@@ -324,9 +382,9 @@
               <div class="player__progress-fill" id="progress-fill"></div>
             </div>
             <div class="player__bar">
-              <button type="button" class="player__btn" id="btn-play" aria-label="تشغيل">
-                <svg id="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                <svg id="icon-pause" viewBox="0 0 24 24" hidden><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+              <button type="button" class="player__btn player__btn--toggle" id="btn-play" aria-label="تشغيل">
+                <svg class="player__btn-icon player__btn-icon--play" id="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                <svg class="player__btn-icon" id="icon-pause" viewBox="0 0 24 24" hidden><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
               </button>
               <span class="player__time" id="time-display">0:00 / 0:00</span>
               <span class="player__spacer"></span>
@@ -480,7 +538,10 @@
         if (e.touches[0]) seekFromClientX(e.touches[0].clientX);
       }, { passive: true });
 
-      video.addEventListener("play", function () { setPlaying(true); });
+      video.addEventListener("play", function () {
+        player.classList.add("has-started");
+        setPlaying(true);
+      });
       video.addEventListener("pause", function () {
         setPlaying(false);
         clearTimeout(controlsTimer);
