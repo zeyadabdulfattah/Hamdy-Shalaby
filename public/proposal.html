@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow">
-  <title>Confirm It × Hamdy Shalaby | Deal Room</title>
+  <title>Confirm It × Hamdy Shalaby | عرض فيديو الموقع</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
@@ -36,32 +36,97 @@
     .deal-room__actions { animation-delay: 0.4s; }
     @keyframes fadeSlideUp { to { opacity: 1; transform: translateY(0); } }
     .brand-lockup {
-      font-family: "Playfair Display", serif; font-weight: 600;
-      font-size: clamp(1.25rem, 4vw, 1.75rem); letter-spacing: 0.12em;
-      text-transform: uppercase; text-align: center; line-height: 1.4; direction: ltr;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      align-items: center;
+      column-gap: clamp(0.4rem, 2.5vw, 1.1rem);
+      width: 100%;
+      max-width: 34rem;
+      margin-inline: auto;
+      direction: ltr;
     }
-    .brand-lockup__confirm { color: var(--text); }
-    .brand-lockup__x { color: var(--muted); font-weight: 400; margin: 0 0.35em; opacity: 0.5; }
-    .brand-lockup__hamdy { color: var(--red); }
-    .deal-room__subtitle {
-      margin-top: 1rem; text-align: center; font-family: "Playfair Display", serif;
-      font-size: clamp(0.875rem, 2.5vw, 1rem); font-weight: 400;
-      letter-spacing: 0.04em; color: var(--muted); direction: ltr;
+    .brand-lockup__logo {
+      width: auto;
+      object-fit: contain;
+      display: block;
+      max-width: 100%;
+    }
+    .brand-lockup__logo--confirm {
+      height: clamp(3.25rem, 12vw, 5rem);
+      max-width: min(220px, 100%);
+      justify-self: end;
+      filter: drop-shadow(0 0 12px rgba(37, 211, 102, 0.15));
+    }
+    .brand-lockup__logo--hamdy {
+      height: clamp(7.5rem, 28vw, 11rem);
+      max-width: min(380px, 100%);
+      justify-self: start;
+    }
+    .brand-lockup__x {
+      font-family: "Playfair Display", serif;
+      font-size: clamp(1.25rem, 4.5vw, 2rem);
+      font-weight: 400;
+      color: var(--muted);
+      opacity: 0.55;
+      line-height: 1;
+      padding-inline: 0.1rem;
+      align-self: center;
+      justify-self: center;
+    }
+    .deal-room__hero-title {
+      margin-top: 1.75rem;
+      text-align: center;
+      font-family: "Cairo", sans-serif;
+      font-weight: 700;
+      font-size: clamp(1.5rem, 5.5vw, 2.35rem);
+      line-height: 1.35;
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+    .deal-room__hero-title span {
+      display: block;
+      margin-top: 0.35rem;
+      font-family: "Playfair Display", serif;
+      font-weight: 600;
+      font-size: clamp(0.95rem, 3vw, 1.15rem);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--green);
+      direction: ltr;
+    }
+    .deal-room__hero-desc {
+      margin-top: 1rem;
+      text-align: center;
+      font-size: clamp(0.9rem, 2.8vw, 1.05rem);
+      line-height: 1.7;
+      color: var(--muted);
+      max-width: 34rem;
+      margin-inline: auto;
+    }
+    .deal-room__hero-desc strong {
+      color: var(--text);
+      font-weight: 700;
     }
     .deal-room__divider {
-      width: 48px; height: 1px;
+      width: 64px; height: 2px;
       background: linear-gradient(90deg, transparent, var(--green), transparent);
-      margin: 2rem auto; opacity: 0.6;
+      margin: 2rem auto 0; opacity: 0.75;
     }
     .video-section__label {
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 1rem; margin-bottom: 0.875rem; flex-wrap: wrap;
+      display: flex; align-items: center; justify-content: center;
+      gap: 0.65rem; margin-bottom: 1rem; flex-wrap: wrap;
     }
-    .video-section__title { font-weight: 700; font-size: 0.95rem; color: var(--text); }
+    .video-section__title {
+      font-weight: 700;
+      font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
     .video-section__badge {
-      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
       color: var(--green); border: 1px solid rgba(37,211,102,0.35);
-      padding: 0.25rem 0.6rem; border-radius: 999px; background: rgba(37,211,102,0.08);
+      padding: 0.3rem 0.65rem; border-radius: 999px; background: rgba(37,211,102,0.08);
     }
     .video-card {
       background: var(--card); border: 1px solid var(--border); border-radius: 14px;
@@ -162,6 +227,22 @@
     }
     @media (max-width: 600px) {
       .deal-room { padding: 2rem 1.25rem 3rem; }
+      .brand-lockup {
+        column-gap: 0.35rem;
+        max-width: 100%;
+      }
+      .brand-lockup__logo--confirm {
+        height: clamp(2.85rem, 13vw, 3.5rem);
+        max-width: 42vw;
+      }
+      .brand-lockup__logo--hamdy {
+        height: clamp(5.75rem, 26vw, 7.25rem);
+        max-width: 46vw;
+      }
+      .brand-lockup__x {
+        font-size: 1.35rem;
+        opacity: 0.6;
+      }
       .deal-room__actions { flex-direction: column; }
       .btn { flex: 1 1 auto; width: 100%; }
       .player__play { width: 60px; height: 60px; }
@@ -179,18 +260,25 @@
   <main class="deal-room">
     <header class="deal-room__header">
       <h1 class="brand-lockup">
-        <span class="brand-lockup__confirm">Confirm It</span>
+        <img class="brand-lockup__logo brand-lockup__logo--confirm" src="images-confirmit-logo/logooo.png" alt="Confirm It" width="160" height="64">
         <span class="brand-lockup__x" aria-hidden="true">×</span>
-        <span class="brand-lockup__hamdy">Hamdy Shalaby</span>
+        <img class="brand-lockup__logo brand-lockup__logo--hamdy" src="images-logo/logo.png" alt="Hamdy Shalaby" width="160" height="64">
       </h1>
-      <p class="deal-room__subtitle">The Autonomous Revenue Engine &amp; Brand Partnership</p>
+      <p class="deal-room__hero-title">
+        عرض فيديو — جولة في موقع حمدي شلبي
+        <span>Website Demo Walkthrough</span>
+      </p>
+      <p class="deal-room__hero-desc">
+        <strong>شاهد العرض التوضيحي</strong> لتجربة المنصة الرقمية كاملة — القائمة، الطلب، والحجز.
+        اضغط <strong>تشغيل</strong> أدناه لبدء المشاهدة.
+      </p>
       <div class="deal-room__divider" aria-hidden="true"></div>
     </header>
 
-    <section class="deal-room__video" aria-label="عرض توضيحي للموقع">
+    <section class="deal-room__video" aria-label="عرض فيديو توضيحي للموقع">
       <div class="video-section__label">
-        <p class="video-section__title">جولة حصرية في المنصة الرقمية</p>
-        <span class="video-section__badge">Exclusive Preview</span>
+        <p class="video-section__title">▶ فيديو العرض التوضيحي</p>
+        <span class="video-section__badge">Site Demo</span>
       </div>
 
       <div class="video-card">
