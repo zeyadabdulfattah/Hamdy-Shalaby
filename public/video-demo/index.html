@@ -1,556 +1,935 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ar" dir="rtl">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="robots" content="noindex, nofollow">
-  <title>Watch Video Demo | Confirm It × Hamdy Shalaby</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --bg: #050505; --card: #111111; --green: #25D366; --red: #8b0000;
-      --text: #f5f5f5; --muted: #888888; --border: #2a2a2a;
-    }
-    html { scroll-behavior: smooth; }
-    @media (max-width: 600px) { html { scroll-behavior: auto; } }
-    body {
-      min-height: 100vh; background: var(--bg); color: var(--text);
-      font-family: "Cairo", sans-serif; font-weight: 400; line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
-    }
-    body::before {
-      content: ""; position: fixed; inset: 0;
-      background:
-        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(37,211,102,0.07), transparent 55%),
-        radial-gradient(ellipse 60% 40% at 80% 100%, rgba(139,0,0,0.06), transparent 50%);
-      pointer-events: none; z-index: 0;
-    }
-    .deal-room { position: relative; z-index: 1; max-width: 800px; margin: 0 auto; padding: 3rem 1.5rem 4rem; }
-    .deal-room__header, .deal-room__video, .deal-room__actions {
-      opacity: 0; transform: translateY(24px); animation: fadeSlideUp 0.8s ease forwards;
-    }
-    .deal-room__header { animation-delay: 0.1s; }
-    .deal-room__video { animation-delay: 0.25s; }
-    .deal-room__actions { animation-delay: 0.4s; }
-    @keyframes fadeSlideUp { to { opacity: 1; transform: translateY(0); } }
-    .brand-lockup {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-      align-items: center;
-      column-gap: clamp(0.4rem, 2.5vw, 1.1rem);
-      width: 100%;
-      max-width: 34rem;
-      margin-inline: auto;
-      direction: ltr;
-    }
-    .brand-lockup__logo {
-      width: auto;
-      object-fit: contain;
-      display: block;
-      max-width: 100%;
-    }
-    .brand-lockup__logo--confirm {
-      height: clamp(3.25rem, 12vw, 5rem);
-      max-width: min(220px, 100%);
-      justify-self: end;
-      filter: drop-shadow(0 0 12px rgba(37, 211, 102, 0.15));
-    }
-    .brand-lockup__logo--hamdy {
-      height: clamp(7.5rem, 28vw, 11rem);
-      max-width: min(380px, 100%);
-      justify-self: start;
-    }
-    .brand-lockup__x {
-      font-family: "Playfair Display", serif;
-      font-size: clamp(1.25rem, 4.5vw, 2rem);
-      font-weight: 400;
-      color: var(--muted);
-      opacity: 0.55;
-      line-height: 1;
-      padding-inline: 0.1rem;
-      align-self: center;
-      justify-self: center;
-    }
-    .deal-room__hero-title {
-      margin-top: 1.75rem;
-      text-align: center;
-      font-family: "Cairo", sans-serif;
-      font-weight: 700;
-      font-size: clamp(1.5rem, 5.5vw, 2.35rem);
-      line-height: 1.35;
-      color: var(--text);
-      letter-spacing: -0.01em;
-    }
-    .deal-room__hero-title span {
-      display: block;
-      margin-top: 0.35rem;
-      font-family: "Playfair Display", serif;
-      font-weight: 600;
-      font-size: clamp(0.95rem, 3vw, 1.15rem);
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: var(--green);
-      direction: ltr;
-    }
-    .deal-room__hero-desc {
-      margin-top: 1rem;
-      text-align: center;
-      font-size: clamp(0.9rem, 2.8vw, 1.05rem);
-      line-height: 1.7;
-      color: var(--muted);
-      max-width: 34rem;
-      margin-inline: auto;
-    }
-    .deal-room__hero-desc strong {
-      color: var(--text);
-      font-weight: 700;
-    }
-    .deal-room__divider {
-      width: 64px; height: 2px;
-      background: linear-gradient(90deg, transparent, var(--green), transparent);
-      margin: 2rem auto 0; opacity: 0.75;
-    }
-    .video-section__label {
-      display: flex; align-items: center; justify-content: center;
-      gap: 0.65rem; margin-bottom: 1rem; flex-wrap: wrap;
-    }
-    .video-section__title {
-      display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
-      font-weight: 700;
-      font-size: clamp(0.8rem, 2.5vw, 0.9rem);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--muted);
-      direction: ltr;
-      margin: 0;
-    }
-    .video-section__title-icon {
-      width: 0.85rem; height: 0.85rem; fill: var(--green); flex-shrink: 0;
-    }
-    .video-section__badge {
-      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
-      color: var(--green); border: 1px solid rgba(37,211,102,0.35);
-      padding: 0.3rem 0.65rem; border-radius: 999px; background: rgba(37,211,102,0.08);
-    }
-    .video-card {
-      background: var(--card); border: 1px solid var(--border); border-radius: 14px;
-      padding: 0.75rem;
-      box-shadow: 0 8px 40px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.03) inset;
-      overflow: hidden;
-    }
-    .video-card::before {
-      content: ""; display: block; height: 2px; margin: -0.75rem -0.75rem 0.75rem;
-      background: linear-gradient(90deg, var(--red), var(--green)); opacity: 0.85;
-    }
-    .player {
-      position: relative; width: 100%; aspect-ratio: 16 / 9;
-      border-radius: 10px; overflow: hidden; background: #000; cursor: pointer;
-      touch-action: manipulation;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .player__video {
-      display: block; width: 100%; height: 100%; object-fit: contain; background: #000;
-    }
-    .player__overlay {
-      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-      background: rgba(0,0,0,0.35);
-      transition: opacity 0.25s ease;
-      z-index: 2;
-    }
-    .player.has-started .player__overlay {
-      display: none;
-    }
-    .player.is-playing:not(.has-started) .player__overlay {
-      opacity: 0; pointer-events: none;
-    }
-    .player__play {
-      width: 68px; height: 68px; border-radius: 50%;
-      border: 2px solid rgba(37, 211, 102, 0.55);
-      background: rgba(5, 5, 5, 0.78);
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 0 0 6px rgba(37, 211, 102, 0.1);
-      flex-shrink: 0;
-    }
-    @media (hover: hover) {
-      .player__play { transition: transform 0.2s ease, border-color 0.2s ease; }
-      .player:not(.has-started):hover .player__play {
-        transform: scale(1.05); border-color: var(--green);
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Watch Video Demo | Confirm It × Hamdy Shalaby</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Playfair+Display:wght@600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
       }
-    }
-    .player__play svg {
-      width: 26px; height: 26px; fill: var(--green);
-      display: block; margin-left: 3px;
-    }
-    .player__controls {
-      position: absolute; inset-inline: 0; bottom: 0; padding: 2.5rem 1rem 0.875rem;
-      background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%);
-      opacity: 0; transform: translateY(6px); transition: opacity 0.3s ease, transform 0.3s ease;
-      pointer-events: none;
-      direction: ltr;
-    }
-    .player__controls.is-visible {
-      opacity: 1; transform: translateY(0); pointer-events: auto;
-    }
-    .player:hover .player__controls.is-visible, .player.is-paused .player__controls.is-visible, .player:focus-within .player__controls.is-visible {
-      opacity: 1; transform: translateY(0);
-    }
-    .player__progress {
-      width: 100%; height: 4px; margin-bottom: 0.65rem;
-      background: rgba(255,255,255,0.15); border-radius: 999px; cursor: pointer; overflow: hidden;
-    }
-    .player__progress-fill { height: 100%; width: 0%; background: var(--green); border-radius: 999px; }
-    .player__bar { display: flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; }
-    .player__btn {
-      appearance: none; border: 0; background: transparent; color: var(--text);
-      cursor: pointer; padding: 0; display: inline-flex; align-items: center; justify-content: center;
-      touch-action: manipulation; -webkit-tap-highlight-color: transparent;
-      width: 2.75rem; height: 2.75rem; flex-shrink: 0; position: relative;
-    }
-    .player__btn--toggle {
-      border-radius: 50%;
-      border: 1.5px solid rgba(255, 255, 255, 0.28);
-      background: rgba(0, 0, 0, 0.35);
-    }
-    .player__btn-icon {
-      position: absolute; inset: 0; margin: auto;
-      width: 16px; height: 16px; fill: var(--green); display: block;
-    }
-    .player__btn-icon--play { margin-left: 2px; }
-    .player__btn-icon[hidden] { display: none !important; }
-    .player__btn:hover, .player__btn:focus-visible { color: var(--green); outline: none; }
-    .player__btn--toggle:hover, .player__btn--toggle:focus-visible { border-color: var(--green); }
-    .player__btn svg:not(.player__btn-icon) {
-      width: 18px; height: 18px; fill: currentColor; display: block;
-    }
-    .player__time {
-      font-size: 0.75rem; color: rgba(255,255,255,0.75); font-variant-numeric: tabular-nums;
-      flex: 1; min-width: 0; direction: ltr; text-align: center; line-height: 1;
-    }
-    .player__spacer { flex: 1; }
-    .video-card__footer {
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 1rem; margin-top: 0.875rem; padding-top: 0.875rem;
-      border-top: 1px solid var(--border); flex-wrap: wrap;
-    }
-    .video-card__caption { font-size: 0.8rem; color: var(--muted); }
-    .btn-download-video {
-      display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
-      font-family: "Cairo", sans-serif; font-weight: 700; font-size: 0.8rem;
-      color: var(--text); text-decoration: none; padding: 0.625rem 0.875rem;
-      border-radius: 6px; border: 1px solid var(--border); background: rgba(255,255,255,0.03);
-      transition: transform 0.2s ease, border-color 0.2s ease, color 0.2s ease;
-      line-height: 1.2; white-space: nowrap;
-    }
-    .btn-download-video svg {
-      width: 16px; height: 16px; fill: var(--green); display: block; flex-shrink: 0;
-    }
-    .btn-download-video:hover, .btn-download-video:focus-visible {
-      transform: translateY(-2px); border-color: var(--green); color: var(--green); outline: none;
-    }
-    .deal-room__actions {
-      display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 2rem;
-      justify-content: center; align-items: stretch; width: 100%;
-    }
-    .btn {
-      display: inline-flex; align-items: center; justify-content: center;
-      min-height: 52px; padding: 0.875rem 1.25rem; border-radius: 8px;
-      font-family: "Cairo", sans-serif; font-weight: 700; font-size: 0.95rem;
-      text-decoration: none; text-align: center; cursor: pointer;
-      transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, border-color 0.25s ease;
-      flex: 1 1 280px; max-width: 100%; line-height: 1.45;
-      touch-action: manipulation; -webkit-tap-highlight-color: transparent;
-    }
-    .btn--primary { background: var(--green); color: #000; border: 2px solid var(--green); }
-    .btn--primary:hover, .btn--primary:focus-visible {
-      transform: translateY(-3px); box-shadow: 0 12px 32px rgba(37,211,102,0.25);
-    }
-    .btn--secondary { background: transparent; color: var(--text); border: 2px solid var(--border); }
-    .btn--secondary:hover, .btn--secondary:focus-visible {
-      transform: translateY(-3px); border-color: #444; box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-    }
-    .btn:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
-    .deal-room__footer {
-      margin-top: 3rem; text-align: center; font-size: 0.75rem; color: var(--muted);
-      letter-spacing: 0.06em; text-transform: uppercase; direction: ltr;
-      opacity: 0; animation: fadeSlideUp 0.8s ease 0.55s forwards;
-    }
-    @media (max-width: 600px) {
-      .deal-room { padding: 2rem 1.25rem 3rem; }
-      body::before { display: none; }
-      .video-card { box-shadow: 0 4px 20px rgba(0,0,0,0.45); }
-      .player__play { width: 64px; height: 64px; }
-      .player__play svg { width: 24px; height: 24px; margin-left: 2px; }
-      .player__btn--toggle { width: 2.5rem; height: 2.5rem; }
-      .player__controls {
-        opacity: 1; transform: none; pointer-events: auto;
-        padding-inline: 0.65rem;
-        padding-bottom: max(0.875rem, env(safe-area-inset-bottom));
+      :root {
+        --bg: #050505;
+        --card: #111111;
+        --green: #25d366;
+        --red: #8b0000;
+        --text: #f5f5f5;
+        --muted: #888888;
+        --border: #2a2a2a;
       }
-      .player.is-playing .player__controls:not(.is-visible) {
-        opacity: 0; pointer-events: none;
+      html {
+        scroll-behavior: smooth;
       }
-      .player__time { font-size: 0.68rem; }
+      @media (max-width: 600px) {
+        html {
+          scroll-behavior: auto;
+        }
+      }
+      body {
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--text);
+        font-family: "Cairo", sans-serif;
+        font-weight: 400;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background:
+          radial-gradient(
+            ellipse 80% 50% at 50% -10%,
+            rgba(37, 211, 102, 0.07),
+            transparent 55%
+          ),
+          radial-gradient(
+            ellipse 60% 40% at 80% 100%,
+            rgba(139, 0, 0, 0.06),
+            transparent 50%
+          );
+        pointer-events: none;
+        z-index: 0;
+      }
+      .deal-room {
+        position: relative;
+        z-index: 1;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 3rem 1.5rem 4rem;
+      }
+      .deal-room__header,
+      .deal-room__video,
+      .deal-room__actions {
+        opacity: 0;
+        transform: translateY(24px);
+        animation: fadeSlideUp 0.8s ease forwards;
+      }
+      .deal-room__header {
+        animation-delay: 0.1s;
+      }
+      .deal-room__video {
+        animation-delay: 0.25s;
+      }
+      .deal-room__actions {
+        animation-delay: 0.4s;
+      }
+      @keyframes fadeSlideUp {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
       .brand-lockup {
-        column-gap: 0.35rem;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        align-items: center;
+        column-gap: clamp(0.4rem, 2.5vw, 1.1rem);
+        width: 100%;
+        max-width: 34rem;
+        margin-inline: auto;
+        direction: ltr;
+      }
+      .brand-lockup__logo {
+        width: auto;
+        object-fit: contain;
+        display: block;
         max-width: 100%;
       }
       .brand-lockup__logo--confirm {
-        height: clamp(2.85rem, 13vw, 3.5rem);
-        max-width: 42vw;
+        height: clamp(3.25rem, 12vw, 5rem);
+        max-width: min(220px, 100%);
+        justify-self: end;
+        filter: drop-shadow(0 0 12px rgba(37, 211, 102, 0.15));
       }
       .brand-lockup__logo--hamdy {
-        height: clamp(5.75rem, 26vw, 7.25rem);
-        max-width: 46vw;
+        height: clamp(7.5rem, 28vw, 11rem);
+        max-width: min(380px, 100%);
+        justify-self: start;
       }
       .brand-lockup__x {
-        font-size: 1.35rem;
-        opacity: 0.6;
+        font-family: "Playfair Display", serif;
+        font-size: clamp(1.25rem, 4.5vw, 2rem);
+        font-weight: 400;
+        color: var(--muted);
+        opacity: 0.55;
+        line-height: 1;
+        padding-inline: 0.1rem;
+        align-self: center;
+        justify-self: center;
       }
-      .deal-room__actions { flex-direction: column; gap: 0.75rem; }
-      .btn {
-        flex: 1 1 auto; width: 100%; max-width: 100%;
-        font-size: 0.88rem; padding: 0.875rem 1rem;
+      .deal-room__hero-title {
+        margin-top: 1.75rem;
+        text-align: center;
+        font-family: "Cairo", sans-serif;
+        font-weight: 700;
+        font-size: clamp(1.5rem, 5.5vw, 2.35rem);
+        line-height: 1.35;
+        color: var(--text);
+        letter-spacing: -0.01em;
+      }
+      .deal-room__hero-title span {
+        display: block;
+        margin-top: 0.35rem;
+        font-family: "Playfair Display", serif;
+        font-weight: 600;
+        font-size: clamp(0.95rem, 3vw, 1.15rem);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--green);
+        direction: ltr;
+      }
+      .deal-room__hero-desc {
+        margin-top: 1rem;
+        text-align: center;
+        font-size: clamp(0.9rem, 2.8vw, 1.05rem);
+        line-height: 1.7;
+        color: var(--muted);
+        max-width: 34rem;
+        margin-inline: auto;
+      }
+      .deal-room__hero-desc strong {
+        color: var(--text);
+        font-weight: 700;
+      }
+      .deal-room__divider {
+        width: 64px;
+        height: 2px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--green),
+          transparent
+        );
+        margin: 2rem auto 0;
+        opacity: 0.75;
       }
       .video-section__label {
-        flex-direction: column; gap: 0.5rem; margin-bottom: 0.875rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.65rem;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
       }
-      .video-section__title { font-size: 0.78rem; letter-spacing: 0.08em; }
+      .video-section__title {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+        font-weight: 700;
+        font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+        direction: ltr;
+        margin: 0;
+      }
+      .video-section__title-icon {
+        width: 0.85rem;
+        height: 0.85rem;
+        fill: var(--green);
+        flex-shrink: 0;
+      }
+      .video-section__badge {
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--green);
+        border: 1px solid rgba(37, 211, 102, 0.35);
+        padding: 0.3rem 0.65rem;
+        border-radius: 999px;
+        background: rgba(37, 211, 102, 0.08);
+      }
+      .video-card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 0.75rem;
+        box-shadow:
+          0 8px 40px rgba(0, 0, 0, 0.55),
+          0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+        overflow: hidden;
+      }
+      .video-card::before {
+        content: "";
+        display: block;
+        height: 2px;
+        margin: -0.75rem -0.75rem 0.75rem;
+        background: linear-gradient(90deg, var(--red), var(--green));
+        opacity: 0.85;
+      }
+      .player {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        border-radius: 10px;
+        overflow: hidden;
+        background: #000;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .player__video {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        background: #000;
+      }
+      .player.is-paused::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        background: rgba(0, 0, 0, 0.28);
+        pointer-events: none;
+      }
+      .player__center {
+        position: absolute;
+        z-index: 3;
+        inset: 0;
+        margin: auto;
+        width: 58px;
+        height: 58px;
+        padding: 0;
+        border: 0;
+        border-radius: 50%;
+        background: var(--green);
+        color: #000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 10px 28px rgba(37, 211, 102, 0.38);
+        cursor: pointer;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .player__center svg {
+        width: 22px;
+        height: 22px;
+        fill: currentColor;
+        display: block;
+        margin-left: 3px;
+      }
+      .player.is-playing .player__center {
+        display: none;
+      }
+      .player__dock {
+        position: absolute;
+        z-index: 4;
+        inset-inline: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.55rem 0.65rem;
+        padding-bottom: max(0.55rem, env(safe-area-inset-bottom));
+        background: linear-gradient(
+          to top,
+          rgba(0, 0, 0, 0.92) 0%,
+          rgba(0, 0, 0, 0.55) 70%,
+          transparent 100%
+        );
+        direction: ltr;
+        transition:
+          opacity 0.22s ease,
+          transform 0.22s ease;
+      }
+      .player.is-playing .player__dock:not(.is-visible) {
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(4px);
+      }
+      .player.is-paused .player__dock {
+        opacity: 1;
+        pointer-events: auto;
+        transform: none;
+      }
+      .player__dock-btn {
+        appearance: none;
+        border: 0;
+        background: transparent;
+        color: #fff;
+        width: 2.25rem;
+        height: 2.25rem;
+        padding: 0;
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .player__dock-btn svg {
+        width: 18px;
+        height: 18px;
+        fill: currentColor;
+        display: block;
+      }
+      .player__dock-btn svg[hidden] {
+        display: none !important;
+      }
+      .player__dock-btn:hover,
+      .player__dock-btn:focus-visible {
+        color: var(--green);
+        outline: none;
+      }
+      @media (hover: hover) {
+        .player.is-playing:hover .player__dock {
+          opacity: 1;
+          pointer-events: auto;
+          transform: none;
+        }
+      }
+      .player__track {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+      }
+      .player__progress {
+        width: 100%;
+        height: 5px;
+        background: rgba(255, 255, 255, 0.18);
+        border-radius: 999px;
+        cursor: pointer;
+        overflow: hidden;
+      }
+      .player__progress-fill {
+        height: 100%;
+        width: 0%;
+        background: var(--green);
+        border-radius: 999px;
+      }
+      .player__time {
+        font-size: 0.68rem;
+        color: rgba(255, 255, 255, 0.72);
+        font-variant-numeric: tabular-nums;
+        line-height: 1;
+        direction: ltr;
+      }
       .video-card__footer {
-        flex-direction: column; align-items: stretch; text-align: center;
-        gap: 0.75rem; padding-top: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-top: 0.875rem;
+        padding-top: 0.875rem;
+        border-top: 1px solid var(--border);
+        flex-wrap: wrap;
       }
-      .video-card__caption { width: 100%; line-height: 1.5; }
-      .btn-download-video { width: 100%; min-height: 44px; white-space: normal; }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .deal-room__header, .deal-room__video, .deal-room__actions, .deal-room__footer {
-        animation: none; opacity: 1; transform: none;
+      .video-card__caption {
+        font-size: 0.8rem;
+        color: var(--muted);
       }
-      .btn, .player__overlay, .player__controls, .player__play, .btn-download-video { transition: none; }
-    }
-  </style>
-</head>
-<body>
-  <main class="deal-room">
-    <header class="deal-room__header">
-      <h1 class="brand-lockup">
-        <img class="brand-lockup__logo brand-lockup__logo--confirm" src="../images-confirmit-logo/logooo.png" alt="Confirm It" width="160" height="64">
-        <span class="brand-lockup__x" aria-hidden="true">×</span>
-        <img class="brand-lockup__logo brand-lockup__logo--hamdy" src="../images-logo/logo.png" alt="Hamdy Shalaby" width="160" height="64">
-      </h1>
-      <p class="deal-room__hero-title">
-        شاهد العرض التوضيحي للموقع
-        <span>Watch Video Demo</span>
-      </p>
-      <p class="deal-room__hero-desc">
-        جولة فيديو سريعة في منصة حمدي شلبي الرقمية — القائمة، الطلب، والحجز.
-        اضغط <strong>تشغيل</strong> أدناه للمشاهدة.
-      </p>
-      <div class="deal-room__divider" aria-hidden="true"></div>
-    </header>
-
-    <section class="deal-room__video" aria-label="Watch video demo">
-      <div class="video-section__label">
-        <p class="video-section__title">
-          <svg class="video-section__title-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
-          <span>Video Demo</span>
+      .btn-download-video {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        font-family: "Cairo", sans-serif;
+        font-weight: 700;
+        font-size: 0.8rem;
+        color: var(--text);
+        text-decoration: none;
+        padding: 0.625rem 0.875rem;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.03);
+        transition:
+          transform 0.2s ease,
+          border-color 0.2s ease,
+          color 0.2s ease;
+        line-height: 1.2;
+        white-space: nowrap;
+      }
+      .btn-download-video svg {
+        width: 16px;
+        height: 16px;
+        fill: var(--green);
+        display: block;
+        flex-shrink: 0;
+      }
+      .btn-download-video:hover,
+      .btn-download-video:focus-visible {
+        transform: translateY(-2px);
+        border-color: var(--green);
+        color: var(--green);
+        outline: none;
+      }
+      .deal-room__actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-top: 2rem;
+        justify-content: center;
+        align-items: stretch;
+        width: 100%;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 52px;
+        padding: 0.875rem 1.25rem;
+        border-radius: 8px;
+        font-family: "Cairo", sans-serif;
+        font-weight: 700;
+        font-size: 0.95rem;
+        text-decoration: none;
+        text-align: center;
+        cursor: pointer;
+        transition:
+          transform 0.25s ease,
+          box-shadow 0.25s ease,
+          background 0.25s ease,
+          border-color 0.25s ease;
+        flex: 1 1 280px;
+        max-width: 100%;
+        line-height: 1.45;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .btn--primary {
+        background: var(--green);
+        color: #000;
+        border: 2px solid var(--green);
+      }
+      .btn--primary:hover,
+      .btn--primary:focus-visible {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 32px rgba(37, 211, 102, 0.25);
+      }
+      .btn--secondary {
+        background: transparent;
+        color: var(--text);
+        border: 2px solid var(--border);
+      }
+      .btn--secondary:hover,
+      .btn--secondary:focus-visible {
+        transform: translateY(-3px);
+        border-color: #444;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      }
+      .btn:focus-visible {
+        outline: 2px solid var(--green);
+        outline-offset: 3px;
+      }
+      .deal-room__footer {
+        margin-top: 3rem;
+        text-align: center;
+        font-size: 0.75rem;
+        color: var(--muted);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        direction: ltr;
+        opacity: 0;
+        animation: fadeSlideUp 0.8s ease 0.55s forwards;
+      }
+      @media (max-width: 600px) {
+        .deal-room {
+          padding: 2rem 1.25rem 3rem;
+        }
+        body::before {
+          display: none;
+        }
+        .video-card {
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+        }
+        .player__center {
+          width: 52px;
+          height: 52px;
+        }
+        .player__center svg {
+          width: 20px;
+          height: 20px;
+          margin-left: 2px;
+        }
+        .player__dock {
+          opacity: 1;
+          pointer-events: auto;
+          transform: none;
+        }
+        .player.is-playing .player__dock:not(.is-visible) {
+          opacity: 0;
+          pointer-events: none;
+          transform: translateY(4px);
+        }
+        .brand-lockup {
+          column-gap: 0.35rem;
+          max-width: 100%;
+        }
+        .brand-lockup__logo--confirm {
+          height: clamp(2.85rem, 13vw, 3.5rem);
+          max-width: 42vw;
+        }
+        .brand-lockup__logo--hamdy {
+          height: clamp(5.75rem, 26vw, 7.25rem);
+          max-width: 46vw;
+        }
+        .brand-lockup__x {
+          font-size: 1.35rem;
+          opacity: 0.6;
+        }
+        .deal-room__actions {
+          flex-direction: column;
+          gap: 0.75rem;
+        }
+        .btn {
+          flex: 1 1 auto;
+          width: 100%;
+          max-width: 100%;
+          font-size: 0.88rem;
+          padding: 0.875rem 1rem;
+        }
+        .video-section__label {
+          flex-direction: column;
+          gap: 0.5rem;
+          margin-bottom: 0.875rem;
+        }
+        .video-section__title {
+          font-size: 0.78rem;
+          letter-spacing: 0.08em;
+        }
+        .video-card__footer {
+          flex-direction: column;
+          align-items: stretch;
+          text-align: center;
+          gap: 0.75rem;
+          padding-top: 0.75rem;
+        }
+        .video-card__caption {
+          width: 100%;
+          line-height: 1.5;
+        }
+        .btn-download-video {
+          width: 100%;
+          min-height: 44px;
+          white-space: normal;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .deal-room__header,
+        .deal-room__video,
+        .deal-room__actions,
+        .deal-room__footer {
+          animation: none;
+          opacity: 1;
+          transform: none;
+        }
+        .btn,
+        .player__dock,
+        .player__center,
+        .btn-download-video {
+          transition: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="deal-room">
+      <header class="deal-room__header">
+        <h1 class="brand-lockup">
+          <img
+            class="brand-lockup__logo brand-lockup__logo--confirm"
+            src="../images-confirmit-logo/logooo.png"
+            alt="Confirm It"
+            width="160"
+            height="64"
+          />
+          <span class="brand-lockup__x" aria-hidden="true">×</span>
+          <img
+            class="brand-lockup__logo brand-lockup__logo--hamdy"
+            src="../images-logo/logo.png"
+            alt="Hamdy Shalaby"
+            width="160"
+            height="64"
+          />
+        </h1>
+        <p class="deal-room__hero-title">
+          شاهد العرض التوضيحي للموقع
+          <span>Watch Video Demo</span>
         </p>
-        <span class="video-section__badge">Watch Now</span>
-      </div>
+        <p class="deal-room__hero-desc">
+          جولة فيديو سريعة في منصة حمدي شلبي الرقمية — القائمة، الطلب، والحجز.
+          اضغط <strong>تشغيل</strong> أدناه للمشاهدة.
+        </p>
+        <div class="deal-room__divider" aria-hidden="true"></div>
+      </header>
 
-      <div class="video-card">
-        <div class="player" id="player">
-          <video class="player__video" id="proposal-video"
-            poster="../images-logo/logo.png"
-            preload="metadata" playsinline webkit-playsinline
-            x-webkit-airplay="allow"
-            aria-label="Confirm It × Hamdy Shalaby — Website Walkthrough">
-            <source src="../images-videodemo/video-demo.MP4" type="video/mp4">
-          </video>
+      <section class="deal-room__video" aria-label="Watch video demo">
+        <div class="video-section__label">
+          <p class="video-section__title">
+            <svg
+              class="video-section__title-icon"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path d="M8 5v14l11-7z" />
+            </svg>
+            <span>Video Demo</span>
+          </p>
+          <span class="video-section__badge">Watch Now</span>
+        </div>
 
-          <div class="player__overlay" id="player-overlay">
-            <div class="player__play" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        <div class="video-card">
+          <div class="player is-paused" id="player">
+            <video
+              class="player__video"
+              id="proposal-video"
+              poster="../images-logo/logo.png"
+              preload="metadata"
+              playsinline
+              webkit-playsinline
+              x-webkit-airplay="allow"
+              aria-label="Confirm It × Hamdy Shalaby — Website Walkthrough"
+            >
+              <source
+                src="../images-videodemo/video-demo.MP4"
+                type="video/mp4"
+              />
+            </video>
+
+            <button
+              type="button"
+              class="player__center"
+              id="btn-center"
+              aria-label="تشغيل"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </button>
+
+            <div class="player__dock is-visible" id="player-controls">
+              <button
+                type="button"
+                class="player__dock-btn"
+                id="btn-play"
+                aria-label="تشغيل"
+              >
+                <svg id="icon-play" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+                <svg id="icon-pause" viewBox="0 0 24 24" hidden aria-hidden="true">
+                  <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+                </svg>
+              </button>
+              <div class="player__track">
+                <div
+                  class="player__progress"
+                  id="progress-bar"
+                  role="slider"
+                  aria-label="تقدم الفيديو"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  aria-valuenow="0"
+                  tabindex="0"
+                >
+                  <div class="player__progress-fill" id="progress-fill"></div>
+                </div>
+                <span class="player__time" id="time-display">0:00 / 0:00</span>
+              </div>
+              <button
+                type="button"
+                class="player__dock-btn"
+                id="btn-fullscreen"
+                aria-label="ملء الشاشة"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"
+                  />
+                </svg>
+              </button>
             </div>
           </div>
 
-          <div class="player__controls" id="player-controls">
-            <div class="player__progress" id="progress-bar" role="slider" aria-label="تقدم الفيديو" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
-              <div class="player__progress-fill" id="progress-fill"></div>
-            </div>
-            <div class="player__bar">
-              <button type="button" class="player__btn player__btn--toggle" id="btn-play" aria-label="تشغيل">
-                <svg class="player__btn-icon player__btn-icon--play" id="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                <svg class="player__btn-icon" id="icon-pause" viewBox="0 0 24 24" hidden><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-              </button>
-              <span class="player__time" id="time-display">0:00 / 0:00</span>
-              <span class="player__spacer"></span>
-              <button type="button" class="player__btn" id="btn-fullscreen" aria-label="ملء الشاشة">
-                <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
-              </button>
-            </div>
+          <div class="video-card__footer">
+            <p class="video-card__caption">
+              عرض خاص — مُعدّ لـ Hamdy Shalaby فقط
+            </p>
+            <a
+              class="btn-download-video"
+              href="../images-videodemo/video-demo.MP4"
+              download="Hamdy-Shalaby-Demo.mp4"
+            >
+              <svg viewBox="0 0 24 24">
+                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
+              </svg>
+              تحميل الفيديو
+            </a>
           </div>
         </div>
+      </section>
 
-        <div class="video-card__footer">
-          <p class="video-card__caption">عرض خاص — مُعدّ لـ Hamdy Shalaby فقط</p>
-          <a class="btn-download-video" href="../images-videodemo/video-demo.MP4" download="Hamdy-Shalaby-Demo.mp4">
-            <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-            تحميل الفيديو
-          </a>
-        </div>
-      </div>
-    </section>
+      <nav class="deal-room__actions" aria-label="إجراءات العرض">
+        <a
+          class="btn btn--primary"
+          href="/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          استعراض النسخة الحية للموقع (Live Staging)
+        </a>
+        <a
+          class="btn btn--secondary"
+          href="../docs/confirmit-hamdy-shalaby-ar.pdf"
+          download="Confirmit-X-Hamdy-Shalaby-Arabic.pdf"
+        >
+          تحميل ملف خطة العمل (PDF — عربي)
+        </a>
+        <a
+          class="btn btn--secondary"
+          href="../docs/confirmit-hamdy-shalaby-en.pdf"
+          download="Confirmit-X-Hamdy-Shalaby.pdf"
+        >
+          Download Proposal (PDF — English)
+        </a>
+      </nav>
 
-    <nav class="deal-room__actions" aria-label="إجراءات العرض">
-      <a class="btn btn--primary" href="/" target="_blank" rel="noopener noreferrer">
-        استعراض النسخة الحية للموقع (Live Staging)
-      </a>
-      <a class="btn btn--secondary" href="../docs/confirmit-hamdy-shalaby-ar.pdf" download="Confirmit-X-Hamdy-Shalaby-Arabic.pdf">
-        تحميل ملف خطة العمل (PDF — عربي)
-      </a>
-      <a class="btn btn--secondary" href="../docs/confirmit-hamdy-shalaby-en.pdf" download="Confirmit-X-Hamdy-Shalaby.pdf">
-        Download Proposal (PDF — English)
-      </a>
-    </nav>
+      <footer class="deal-room__footer">
+        Confirm It × Hamdy Shalaby — Video Demo
+      </footer>
+    </main>
 
-    <footer class="deal-room__footer">Confirm It × Hamdy Shalaby — Video Demo</footer>
-  </main>
+    <script>
+      (function () {
+        var player = document.getElementById("player");
+        var video = document.getElementById("proposal-video");
+        var btnCenter = document.getElementById("btn-center");
+        var controls = document.getElementById("player-controls");
+        var btnPlay = document.getElementById("btn-play");
+        var iconPlay = document.getElementById("icon-play");
+        var iconPause = document.getElementById("icon-pause");
+        var progressBar = document.getElementById("progress-bar");
+        var progressFill = document.getElementById("progress-fill");
+        var timeDisplay = document.getElementById("time-display");
+        var btnFullscreen = document.getElementById("btn-fullscreen");
+        var isTouch = window.matchMedia(
+          "(max-width: 600px), (hover: none)",
+        ).matches;
+        var controlsTimer = null;
+        var rafPending = false;
 
-  <script>
-    (function () {
-      var player = document.getElementById("player");
-      var video = document.getElementById("proposal-video");
-      var overlay = document.getElementById("player-overlay");
-      var controls = document.getElementById("player-controls");
-      var btnPlay = document.getElementById("btn-play");
-      var iconPlay = document.getElementById("icon-play");
-      var iconPause = document.getElementById("icon-pause");
-      var progressBar = document.getElementById("progress-bar");
-      var progressFill = document.getElementById("progress-fill");
-      var timeDisplay = document.getElementById("time-display");
-      var btnFullscreen = document.getElementById("btn-fullscreen");
-      var isTouch = window.matchMedia("(max-width: 600px), (hover: none)").matches;
-      var controlsTimer = null;
-      var rafPending = false;
+        function formatTime(seconds) {
+          if (!isFinite(seconds)) return "0:00";
+          var m = Math.floor(seconds / 60);
+          var s = Math.floor(seconds % 60);
+          return m + ":" + String(s).padStart(2, "0");
+        }
 
-      function formatTime(seconds) {
-        if (!isFinite(seconds)) return "0:00";
-        var m = Math.floor(seconds / 60);
-        var s = Math.floor(seconds % 60);
-        return m + ":" + String(s).padStart(2, "0");
-      }
+        function updateTime() {
+          if (rafPending) return;
+          rafPending = true;
+          requestAnimationFrame(function () {
+            rafPending = false;
+            timeDisplay.textContent =
+              formatTime(video.currentTime) +
+              " / " +
+              formatTime(video.duration);
+            var pct = video.duration
+              ? (video.currentTime / video.duration) * 100
+              : 0;
+            progressFill.style.width = pct + "%";
+            progressBar.setAttribute("aria-valuenow", Math.round(pct));
+          });
+        }
 
-      function updateTime() {
-        if (rafPending) return;
-        rafPending = true;
-        requestAnimationFrame(function () {
-          rafPending = false;
-          timeDisplay.textContent = formatTime(video.currentTime) + " / " + formatTime(video.duration);
-          var pct = video.duration ? (video.currentTime / video.duration) * 100 : 0;
-          progressFill.style.width = pct + "%";
-          progressBar.setAttribute("aria-valuenow", Math.round(pct));
-        });
-      }
+        function setPlaying(playing) {
+          player.classList.toggle("is-playing", playing);
+          player.classList.toggle("is-paused", !playing);
+          iconPlay.hidden = playing;
+          iconPause.hidden = !playing;
+          btnPlay.setAttribute("aria-label", playing ? "إيقاف مؤقت" : "تشغيل");
+          btnCenter.setAttribute("aria-label", playing ? "إيقاف مؤقت" : "تشغيل");
+          controls.classList.add("is-visible");
+          if (playing && isTouch) showControlsTemporarily();
+        }
 
-      function setPlaying(playing) {
-        player.classList.toggle("is-playing", playing);
-        player.classList.toggle("is-paused", !playing);
-        iconPlay.hidden = playing;
-        iconPause.hidden = !playing;
-        btnPlay.setAttribute("aria-label", playing ? "إيقاف مؤقت" : "تشغيل");
-        if (playing && isTouch) showControlsTemporarily();
-        else if (!playing && isTouch) controls.classList.add("is-visible");
-      }
-
-      function showControlsTemporarily() {
-        controls.classList.add("is-visible");
-        clearTimeout(controlsTimer);
-        if (!video.paused) {
+        function showControlsTemporarily() {
+          controls.classList.add("is-visible");
+          clearTimeout(controlsTimer);
           controlsTimer = setTimeout(function () {
-            controls.classList.remove("is-visible");
-          }, 3200);
+            if (!video.paused) controls.classList.remove("is-visible");
+          }, 2800);
         }
-      }
 
-      function togglePlay() {
-        if (video.paused) video.play(); else video.pause();
-      }
-
-      function seekFromClientX(clientX) {
-        if (!video.duration) return;
-        var rect = progressBar.getBoundingClientRect();
-        var ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
-        video.currentTime = ratio * video.duration;
-      }
-
-      function toggleFullscreen() {
-        var fsEl = document.fullscreenElement || document.webkitFullscreenElement;
-        if (fsEl) {
-          if (document.exitFullscreen) document.exitFullscreen();
-          else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-          return;
+        function togglePlay() {
+          if (video.paused) video.play();
+          else video.pause();
         }
-        if (video.webkitEnterFullscreen) {
-          video.webkitEnterFullscreen();
-          return;
+
+        function seekFromClientX(clientX) {
+          if (!video.duration) return;
+          var rect = progressBar.getBoundingClientRect();
+          var ratio = Math.max(
+            0,
+            Math.min(1, (clientX - rect.left) / rect.width),
+          );
+          video.currentTime = ratio * video.duration;
         }
-        if (video.requestFullscreen) {
-          video.requestFullscreen();
-          return;
+
+        function toggleFullscreen() {
+          var fsEl =
+            document.fullscreenElement || document.webkitFullscreenElement;
+          if (fsEl) {
+            if (document.exitFullscreen) document.exitFullscreen();
+            else if (document.webkitExitFullscreen)
+              document.webkitExitFullscreen();
+            return;
+          }
+          if (video.webkitEnterFullscreen) {
+            video.webkitEnterFullscreen();
+            return;
+          }
+          if (video.requestFullscreen) {
+            video.requestFullscreen();
+            return;
+          }
+          if (player.requestFullscreen) player.requestFullscreen();
+          else if (player.webkitRequestFullscreen)
+            player.webkitRequestFullscreen();
         }
-        if (player.requestFullscreen) player.requestFullscreen();
-        else if (player.webkitRequestFullscreen) player.webkitRequestFullscreen();
-      }
 
-      overlay.addEventListener("click", togglePlay);
-      btnPlay.addEventListener("click", function (e) { e.stopPropagation(); togglePlay(); });
-      btnFullscreen.addEventListener("click", function (e) {
-        e.stopPropagation();
-        toggleFullscreen();
-      });
+        btnCenter.addEventListener("click", function (e) {
+          e.stopPropagation();
+          togglePlay();
+        });
+        btnPlay.addEventListener("click", function (e) {
+          e.stopPropagation();
+          togglePlay();
+        });
+        btnFullscreen.addEventListener("click", function (e) {
+          e.stopPropagation();
+          toggleFullscreen();
+        });
 
-      player.addEventListener("click", function (e) {
-        if (e.target.closest(".player__controls") || e.target.closest(".player__overlay")) return;
-        if (isTouch && !video.paused) {
-          showControlsTemporarily();
-          return;
+        player.addEventListener("click", function (e) {
+          if (
+            e.target.closest(".player__dock") ||
+            e.target.closest(".player__center")
+          )
+            return;
+          if (isTouch && !video.paused) {
+            showControlsTemporarily();
+            return;
+          }
+          togglePlay();
+        });
+
+        if (isTouch) {
+          player.addEventListener(
+            "touchstart",
+            function () {
+              if (!video.paused) showControlsTemporarily();
+            },
+            { passive: true },
+          );
         }
-        togglePlay();
-      });
 
-      if (isTouch) {
-        controls.classList.add("is-visible");
-        player.addEventListener("touchstart", function () {
-          if (!video.paused) showControlsTemporarily();
-        }, { passive: true });
-      }
+        progressBar.addEventListener("click", function (e) {
+          e.stopPropagation();
+          seekFromClientX(e.clientX);
+        });
+        progressBar.addEventListener(
+          "touchstart",
+          function (e) {
+            e.stopPropagation();
+            if (e.touches[0]) seekFromClientX(e.touches[0].clientX);
+          },
+          { passive: true },
+        );
 
-      progressBar.addEventListener("click", function (e) {
-        e.stopPropagation();
-        seekFromClientX(e.clientX);
-      });
-      progressBar.addEventListener("touchstart", function (e) {
-        e.stopPropagation();
-        if (e.touches[0]) seekFromClientX(e.touches[0].clientX);
-      }, { passive: true });
-
-      video.addEventListener("play", function () {
-        player.classList.add("has-started");
-        setPlaying(true);
-      });
-      video.addEventListener("pause", function () {
-        setPlaying(false);
-        clearTimeout(controlsTimer);
-        controls.classList.add("is-visible");
-      });
-      video.addEventListener("timeupdate", updateTime);
-      video.addEventListener("loadedmetadata", updateTime);
-      video.addEventListener("webkitendfullscreen", function () { setPlaying(false); });
-    })();
-  </script>
-</body>
+        video.addEventListener("play", function () {
+          setPlaying(true);
+        });
+        video.addEventListener("pause", function () {
+          setPlaying(false);
+          clearTimeout(controlsTimer);
+          controls.classList.add("is-visible");
+        });
+        video.addEventListener("timeupdate", updateTime);
+        video.addEventListener("loadedmetadata", updateTime);
+        video.addEventListener("webkitendfullscreen", function () {
+          setPlaying(false);
+        });
+      })();
+    </script>
+  </body>
 </html>
