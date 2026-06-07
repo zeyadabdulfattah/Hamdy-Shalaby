@@ -6,6 +6,8 @@
 
   const STORAGE_KEY = "hamdy-order";
   const ORDER_API_URL = null;
+  /** Demo mode: skip WhatsApp and show cinematic confirmation (for recordings). Set false for production. */
+  const DEMO_CHECKOUT = true;
 
   /** EGP prices keyed by cart id (category-slug) */
   const MENU_PRICES = {
@@ -47,6 +49,7 @@
   let view = "collapsed";
   let checkoutStep = "form";
   let lastOrderId = null;
+  let lastOrderSummary = null;
   let toastTimer = null;
 
   const els = {};
@@ -647,6 +650,46 @@
     applyI18nTo(els.productDetail);
   }
 
+
+  function hideDemoConfirmation() {
+    if (!els.demoConfirm) return;
+    els.demoConfirm.classList.remove("is-visible");
+    document.documentElement.classList.remove("is-demo-confirm-open");
+    setTimeout(() => {
+      els.demoConfirm.hidden = true;
+    }, 450);
+    checkoutStep = "form";
+    setView("collapsed");
+  }
+
+  function showDemoConfirmation(summary) {
+    if (!els.demoConfirm || !summary) return;
+
+    const lang = getLang();
+    if (els.demoConfirmId) els.demoConfirmId.textContent = summary.orderId;
+    if (els.demoConfirmTotal) {
+      els.demoConfirmTotal.textContent = t(
+        `${summary.count} item${summary.count === 1 ? "" : "s"} · ${formatPrice(summary.total)}`,
+        `${summary.count} ${summary.count === 1 ? "عنصر" : "عناصر"} · ${formatPrice(summary.total)}`
+      );
+    }
+    if (els.demoConfirmEta) {
+      const isDelivery = summary.form?.type === "delivery";
+      els.demoConfirmEta.textContent = isDelivery
+        ? t("Estimated delivery: 35–45 min", "التوصيل المتوقع: 35–45 دقيقة")
+        : t("Ready for pickup in ~25 min", "جاهز للاستلام خلال ~25 دقيقة");
+    }
+
+    applyI18nTo(els.demoConfirm);
+
+    els.demoConfirm.hidden = false;
+    document.documentElement.classList.add("is-demo-confirm-open");
+    requestAnimationFrame(() => {
+      els.demoConfirm.classList.add("is-visible");
+      els.demoConfirmClose?.focus({ preventScroll: true });
+    });
+  }
+
   function handleCheckoutSubmit(e) {
     e.preventDefault();
     if (!items.length) return;
@@ -677,6 +720,21 @@
     }
 
     lastOrderId = generateOrderId();
+    lastOrderSummary = {
+      orderId: lastOrderId,
+      total: getTotalAmount(),
+      count: getTotalCount(),
+      form,
+    };
+
+    if (DEMO_CHECKOUT) {
+      checkoutStep = "success";
+      clear();
+      render();
+      showDemoConfirmation(lastOrderSummary);
+      return;
+    }
+
     const message = buildWhatsAppMessage(lastOrderId, form);
     const waUrl = `https://wa.me/${getWhatsAppNumber()}?text=${encodeURIComponent(message)}`;
 
@@ -757,9 +815,13 @@
       }
     });
 
+    els.demoConfirmClose?.addEventListener("click", hideDemoConfirmation);
+    els.demoConfirmBackdrop?.addEventListener("click", hideDemoConfirmation);
+
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
-        if (!els.productDetail?.hidden) closeProductDetail();
+        if (els.demoConfirm && !els.demoConfirm.hidden) hideDemoConfirmation();
+        else if (!els.productDetail?.hidden) closeProductDetail();
         else if (view !== "collapsed") setView("collapsed");
       }
     });
@@ -825,6 +887,11 @@
     load();
     bindEvents();
     syncAddressField(false);
+    if (DEMO_CHECKOUT && els.placeBtn) {
+      els.placeBtn.setAttribute("data-en", "Confirm order");
+      els.placeBtn.setAttribute("data-ar", "تأكيد الطلب");
+      els.placeBtn.textContent = t("Confirm order", "تأكيد الطلب");
+    }
     render();
   }
 

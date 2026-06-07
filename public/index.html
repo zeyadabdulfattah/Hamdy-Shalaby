@@ -892,6 +892,42 @@
     </div>
   </aside>
 
+  <div class="order-demo-confirm" id="order-demo-confirm" hidden role="dialog" aria-modal="true" aria-labelledby="order-demo-confirm-title">
+    <div class="order-demo-confirm__backdrop" id="order-demo-confirm-backdrop"></div>
+    <div class="order-demo-confirm__card">
+      <div class="order-demo-confirm__glow" aria-hidden="true"></div>
+      <div class="order-demo-confirm__check" aria-hidden="true">
+        <svg viewBox="0 0 80 80" fill="none">
+          <circle class="order-demo-confirm__ring" cx="40" cy="40" r="34" stroke="currentColor" stroke-width="2"/>
+          <path class="order-demo-confirm__tick" d="M24 41 L36 53 L58 28" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <p class="order-demo-confirm__eyebrow" data-en="Order confirmed" data-ar="تم تأكيد الطلب">تم تأكيد الطلب</p>
+      <h2 class="order-demo-confirm__title" id="order-demo-confirm-title" data-en="Thank you — we're on it" data-ar="شكراً لك — طلبك قيد التحضير">شكراً لك — طلبك قيد التحضير</h2>
+      <p class="order-demo-confirm__ref">
+        <span data-en="Reference" data-ar="رقم الطلب">رقم الطلب</span>
+        <strong id="order-demo-confirm-id"></strong>
+      </p>
+      <p class="order-demo-confirm__total" id="order-demo-confirm-total"></p>
+      <ol class="order-demo-confirm__steps">
+        <li class="is-done">
+          <span class="order-demo-confirm__step-dot"></span>
+          <span data-en="Order received" data-ar="تم استلام الطلب">تم استلام الطلب</span>
+        </li>
+        <li class="is-active">
+          <span class="order-demo-confirm__step-dot"></span>
+          <span data-en="Kitchen preparing" data-ar="المطبخ يحضّر طلبك">المطبخ يحضّر طلبك</span>
+        </li>
+        <li>
+          <span class="order-demo-confirm__step-dot"></span>
+          <span data-en="On the way" data-ar="في الطريق إليك">في الطريق إليك</span>
+        </li>
+      </ol>
+      <p class="order-demo-confirm__eta" id="order-demo-confirm-eta"></p>
+      <button type="button" class="btn btn--accent btn--lg" id="order-demo-confirm-close" data-en="Continue browsing" data-ar="متابعة التصفح">متابعة التصفح</button>
+    </div>
+  </div>
+
   <div class="order-toast" id="order-toast" role="status" aria-live="polite" aria-atomic="true" hidden>
     <span class="order-toast__mark" aria-hidden="true">
       <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/><path d="M7 12l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
