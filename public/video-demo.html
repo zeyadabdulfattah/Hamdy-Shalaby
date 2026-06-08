@@ -171,6 +171,18 @@
       width: 22px; height: 22px; fill: currentColor; display: block; margin-left: 3px;
     }
     .player.is-playing .player__center { display: none; }
+    .player.is-buffering .player__center { display: none; }
+    .player__loader {
+      position: absolute; z-index: 5; inset: 0; margin: auto;
+      width: 2.5rem; height: 2.5rem;
+      border: 3px solid rgba(255, 255, 255, 0.2);
+      border-top-color: var(--green);
+      border-radius: 50%;
+      animation: playerSpin 0.75s linear infinite;
+      display: none;
+    }
+    .player.is-buffering .player__loader { display: block; }
+    @keyframes playerSpin { to { transform: rotate(360deg); } }
     .player__dock {
       position: absolute; z-index: 4; inset-inline: 0; bottom: 0;
       display: flex; align-items: center; gap: 0.5rem;
@@ -342,8 +354,10 @@
             preload="metadata" playsinline webkit-playsinline
             x-webkit-airplay="allow"
             aria-label="Confirm It × Hamdy Shalaby — Website Walkthrough">
-            <source src="images-videodemo/video-demo.MP4" type="video/mp4">
+            <source src="images-videodemo/video-demo.mp4" type="video/mp4">
           </video>
+
+          <div class="player__loader" id="player-loader" aria-hidden="true"></div>
 
           <button type="button" class="player__center" id="btn-center" aria-label="تشغيل">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
@@ -368,7 +382,7 @@
 
         <div class="video-card__footer">
           <p class="video-card__caption">عرض خاص — مُعدّ لـ Hamdy Shalaby فقط</p>
-          <a class="btn-download-video" href="images-videodemo/video-demo.MP4" download="Hamdy-Shalaby-Demo.mp4">
+          <a class="btn-download-video" href="images-videodemo/video-demo.mp4" download="Hamdy-Shalaby-Demo.mp4">
             <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
             تحميل الفيديو
           </a>
@@ -438,6 +452,10 @@
         if (playing && isTouch) showControlsTemporarily();
       }
 
+      function setBuffering(buffering) {
+        player.classList.toggle("is-buffering", buffering);
+      }
+
       function showControlsTemporarily() {
         controls.classList.add("is-visible");
         clearTimeout(controlsTimer);
@@ -447,7 +465,15 @@
       }
 
       function togglePlay() {
-        if (video.paused) video.play(); else video.pause();
+        if (video.paused) {
+          setBuffering(true);
+          var playPromise = video.play();
+          if (playPromise && playPromise.catch) {
+            playPromise.catch(function () { setBuffering(false); });
+          }
+        } else {
+          video.pause();
+        }
       }
 
       function seekFromClientX(clientX) {
@@ -513,8 +539,13 @@
       video.addEventListener("play", function () {
         setPlaying(true);
       });
+      video.addEventListener("playing", function () { setBuffering(false); });
+      video.addEventListener("waiting", function () { setBuffering(true); });
+      video.addEventListener("canplay", function () { setBuffering(false); });
+      video.addEventListener("error", function () { setBuffering(false); });
       video.addEventListener("pause", function () {
         setPlaying(false);
+        setBuffering(false);
         clearTimeout(controlsTimer);
         controls.classList.add("is-visible");
       });

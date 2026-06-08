@@ -287,6 +287,30 @@
       .player.is-playing .player__center {
         display: none;
       }
+      .player.is-buffering .player__center {
+        display: none;
+      }
+      .player__loader {
+        position: absolute;
+        z-index: 5;
+        inset: 0;
+        margin: auto;
+        width: 2.5rem;
+        height: 2.5rem;
+        border: 3px solid rgba(255, 255, 255, 0.2);
+        border-top-color: var(--green);
+        border-radius: 50%;
+        animation: playerSpin 0.75s linear infinite;
+        display: none;
+      }
+      .player.is-buffering .player__loader {
+        display: block;
+      }
+      @keyframes playerSpin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
       .player__dock {
         position: absolute;
         z-index: 4;
@@ -660,10 +684,12 @@
               aria-label="Confirm It × Hamdy Shalaby — Website Walkthrough"
             >
               <source
-                src="../images-videodemo/video-demo.MP4"
+                src="../images-videodemo/video-demo.mp4"
                 type="video/mp4"
               />
             </video>
+
+            <div class="player__loader" id="player-loader" aria-hidden="true"></div>
 
             <button
               type="button"
@@ -726,7 +752,7 @@
             </p>
             <a
               class="btn-download-video"
-              href="../images-videodemo/video-demo.MP4"
+              href="../images-videodemo/video-demo.mp4"
               download="Hamdy-Shalaby-Demo.mp4"
             >
               <svg viewBox="0 0 24 24">
@@ -822,6 +848,10 @@
           if (playing && isTouch) showControlsTemporarily();
         }
 
+        function setBuffering(buffering) {
+          player.classList.toggle("is-buffering", buffering);
+        }
+
         function showControlsTemporarily() {
           controls.classList.add("is-visible");
           clearTimeout(controlsTimer);
@@ -831,8 +861,15 @@
         }
 
         function togglePlay() {
-          if (video.paused) video.play();
-          else video.pause();
+          if (video.paused) {
+            setBuffering(true);
+            var playPromise = video.play();
+            if (playPromise && playPromise.catch) {
+              playPromise.catch(function () { setBuffering(false); });
+            }
+          } else {
+            video.pause();
+          }
         }
 
         function seekFromClientX(clientX) {
@@ -919,8 +956,13 @@
         video.addEventListener("play", function () {
           setPlaying(true);
         });
+        video.addEventListener("playing", function () { setBuffering(false); });
+        video.addEventListener("waiting", function () { setBuffering(true); });
+        video.addEventListener("canplay", function () { setBuffering(false); });
+        video.addEventListener("error", function () { setBuffering(false); });
         video.addEventListener("pause", function () {
           setPlaying(false);
+          setBuffering(false);
           clearTimeout(controlsTimer);
           controls.classList.add("is-visible");
         });
