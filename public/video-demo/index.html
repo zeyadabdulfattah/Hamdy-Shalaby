@@ -306,6 +306,46 @@
       .player.is-buffering .player__loader {
         display: block;
       }
+      .player.is-error .player__loader {
+        display: none;
+      }
+      .player__error {
+        position: absolute;
+        z-index: 6;
+        inset: 0;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        padding: 1rem;
+        text-align: center;
+        background: rgba(0, 0, 0, 0.72);
+      }
+      .player.is-error .player__error {
+        display: flex;
+      }
+      .player.is-error .player__center {
+        display: none;
+      }
+      .player__error-text {
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.85);
+        line-height: 1.5;
+        max-width: 16rem;
+      }
+      .player__error-btn {
+        appearance: none;
+        border: 1px solid var(--green);
+        background: transparent;
+        color: var(--green);
+        font-family: "Cairo", sans-serif;
+        font-weight: 700;
+        font-size: 0.8rem;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        cursor: pointer;
+      }
       @keyframes playerSpin {
         to {
           transform: rotate(360deg);
@@ -684,12 +724,16 @@
               aria-label="Confirm It × Hamdy Shalaby — Website Walkthrough"
             >
               <source
-                src="../images-videodemo/video-demo.mp4"
+                src="../images-videodemo/video-demo.MP4"
                 type="video/mp4"
               />
             </video>
 
             <div class="player__loader" id="player-loader" aria-hidden="true"></div>
+            <div class="player__error" id="player-error" hidden>
+              <p class="player__error-text">تعذّر تحميل الفيديو. تحقق من الاتصال وحاول مرة أخرى.</p>
+              <button type="button" class="player__error-btn" id="btn-retry">إعادة المحاولة</button>
+            </div>
 
             <button
               type="button"
@@ -752,7 +796,7 @@
             </p>
             <a
               class="btn-download-video"
-              href="../images-videodemo/video-demo.mp4"
+              href="../images-videodemo/video-demo.MP4"
               download="Hamdy-Shalaby-Demo.mp4"
             >
               <svg viewBox="0 0 24 24">
@@ -807,10 +851,13 @@
         var progressFill = document.getElementById("progress-fill");
         var timeDisplay = document.getElementById("time-display");
         var btnFullscreen = document.getElementById("btn-fullscreen");
+        var btnRetry = document.getElementById("btn-retry");
+        var playerError = document.getElementById("player-error");
         var isTouch = window.matchMedia(
           "(max-width: 600px), (hover: none)",
         ).matches;
         var controlsTimer = null;
+        var bufferTimer = null;
         var rafPending = false;
 
         function formatTime(seconds) {
@@ -850,6 +897,25 @@
 
         function setBuffering(buffering) {
           player.classList.toggle("is-buffering", buffering);
+          clearTimeout(bufferTimer);
+          if (buffering) {
+            bufferTimer = setTimeout(function () {
+              if (video.paused || video.readyState < 2) showError();
+            }, 12000);
+          }
+        }
+
+        function showError() {
+          setBuffering(false);
+          player.classList.add("is-error");
+          playerError.hidden = false;
+          video.pause();
+          setPlaying(false);
+        }
+
+        function clearError() {
+          player.classList.remove("is-error");
+          playerError.hidden = true;
         }
 
         function showControlsTemporarily() {
@@ -862,10 +928,10 @@
 
         function togglePlay() {
           if (video.paused) {
-            setBuffering(true);
+            clearError();
             var playPromise = video.play();
             if (playPromise && playPromise.catch) {
-              playPromise.catch(function () { setBuffering(false); });
+              playPromise.catch(function () { showError(); });
             }
           } else {
             video.pause();
@@ -916,6 +982,12 @@
           e.stopPropagation();
           toggleFullscreen();
         });
+        btnRetry.addEventListener("click", function (e) {
+          e.stopPropagation();
+          clearError();
+          video.load();
+          togglePlay();
+        });
 
         player.addEventListener("click", function (e) {
           if (
@@ -957,9 +1029,11 @@
           setPlaying(true);
         });
         video.addEventListener("playing", function () { setBuffering(false); });
-        video.addEventListener("waiting", function () { setBuffering(true); });
+        video.addEventListener("waiting", function () {
+          if (!video.paused) setBuffering(true);
+        });
         video.addEventListener("canplay", function () { setBuffering(false); });
-        video.addEventListener("error", function () { setBuffering(false); });
+        video.addEventListener("error", function () { showError(); });
         video.addEventListener("pause", function () {
           setPlaying(false);
           setBuffering(false);
